@@ -1222,7 +1222,9 @@ function makeTaxi(){
   g.add(part(BOXG, new THREE.MeshLambertMaterial({color:"#FBFBF6"}), 13, 2.6, 14.3, -1, 6.6, 0)); // шашечная полоса
   g.add(part(BOXG, darkMat, 15, 3, 11.4, -3, 11.4, 0));                                   // открытый салон
   g.add(part(BOXG, hood, 6, 4, 14, 9, 12, 0));                                           // капот
-  const ws = part(BOXG, glassMat, 0.9, 6.4, 12.4, 5.4, 14.4, 0);
+  const ws = part(BOXG, new THREE.MeshLambertMaterial({color:"#CFEAF4", transparent:true, opacity:0.22, depthWrite:false}),
+    0.9, 6.4, 12.4, 5.4, 14.4, 0);
+  ws.castShadow = false; ws.renderOrder = 2;                                              // прозрачное: видно морду водителя
   ws.rotation.z = 0.32; g.add(ws);                                                         // лобовое стекло
   g.add(part(BOXG, darkMat, 1.8, 7, 12.4, -11, 14.6, 0));                                 // дуга за спиной
   g.add(part(BOXG, new THREE.MeshBasicMaterial({color:"#FFD37A"}), 7, 3.2, 8.6, -11, 19.2, 0)); // шашечка
@@ -1611,11 +1613,27 @@ markerGroup.add(beam); markerGroup.add(ring); markerGroup.visible = false;
 scene.add(markerGroup);
 
 /* --- стрелка над такси --- */
-const arrowMat = new THREE.MeshBasicMaterial({color:"#2E8C56"});
-const arrowPivot = new THREE.Group();
-const arrowCone = new THREE.Mesh(new THREE.ConeGeometry(4, 11, 4), arrowMat);
-arrowCone.rotation.z = -Math.PI/2; arrowCone.position.x = 12;
-arrowPivot.add(arrowCone); arrowPivot.visible = false;
+/* стрелка-подсказка: толстая плоская стрелка с белой каймой; её плоскость наклонена к камере,
+   поэтому она читается, даже когда показывает прямо вперёд */
+const arrowMat = new THREE.MeshBasicMaterial({color:"#2E8C56", depthTest:false});
+const arrowRimMat = new THREE.MeshBasicMaterial({color:"#FFFFFF", depthTest:false});
+function arrowGeo(k){
+  const sh = new THREE.Shape();
+  sh.moveTo(-13*k, -3.2*k); sh.lineTo(1*k, -3.2*k); sh.lineTo(1*k, -8*k); sh.lineTo(14*k, 0);
+  sh.lineTo(1*k, 8*k); sh.lineTo(1*k, 3.2*k); sh.lineTo(-13*k, 3.2*k); sh.closePath();
+  const g = new THREE.ExtrudeGeometry(sh, {depth:1.6, bevelEnabled:false});
+  g.rotateX(-Math.PI/2);                                   // ложится в плоскость XZ, остриём по +x
+  return g;
+}
+const arrowPivot = new THREE.Group();                      // поворот к камере + наклон
+arrowPivot.rotation.order = "YXZ";
+const arrowSpin = new THREE.Group();                       // направление на цель внутри наклонённой плоскости
+const arrowRim = new THREE.Mesh(arrowGeo(1.22), arrowRimMat);
+arrowRim.position.set(-0.4, -0.6, 0); arrowRim.renderOrder = 8;
+const arrowBody = new THREE.Mesh(arrowGeo(1), arrowMat);
+arrowBody.renderOrder = 9;
+arrowSpin.add(arrowRim); arrowSpin.add(arrowBody);
+arrowPivot.add(arrowSpin); arrowPivot.visible = false;
 scene.add(arrowPivot);
 
 /* --- монетки --- */
@@ -1721,9 +1739,12 @@ function syncScene(dt){
     beamMat.color.set(col); ringMat.color.set(col); arrowMat.color.set(col);
     const pulse = 1 + Math.sin(clock*3)*0.12;
     ring.scale.set(pulse, pulse, 1);
-    arrowPivot.visible = true;
-    arrowPivot.position.set(car.x, 30 + Math.sin(clock*2.4)*1.6, car.y);
-    arrowPivot.rotation.y = -Math.atan2(tg.y-car.y, tg.x-car.x);
+    arrowPivot.visible = viewMode !== 2;
+    arrowPivot.position.set(car.x, 27 + Math.sin(clock*2.4)*1.2, car.y);
+    const camYaw = Math.atan2(-(camAim.x - camPos.x), -(camAim.z - camPos.z));
+    arrowPivot.rotation.set(viewMode === 1 ? 0 : 0.95, camYaw, 0);      // сверху — лежит плашмя
+    arrowSpin.rotation.y = -Math.atan2(tg.y-car.y, tg.x-car.x) - camYaw;
+    arrowSpin.scale.setScalar((viewMode === 1 ? 1.1 : 0.58) * (1 + Math.sin(clock*4)*0.06));
   } else { markerGroup.visible = false; arrowPivot.visible = false; }
 
   // солнце едет за такси, чтобы тени были всегда рядом
@@ -1737,7 +1758,7 @@ function syncScene(dt){
     // портрет: камера перед капотом, смотрит на голову водителя
     const hx = car.x + 1.2*ca + 3.1*sa, hz = car.y + 1.2*sa - 3.1*ca;
     const sw = Math.sin(clock*0.4)*0.22;
-    tmp.set(hx + Math.cos(car.a + sw)*27, 19.5, hz + Math.sin(car.a + sw)*27);
+    tmp.set(hx + Math.cos(car.a + sw)*27, 21.5, hz + Math.sin(car.a + sw)*27);
     camPos.lerp(tmp, k);
     tmp.set(hx, 15.4, hz);
     camAim.lerp(tmp, k);
