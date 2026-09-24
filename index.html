@@ -209,6 +209,26 @@ button{font:inherit;color:inherit;cursor:pointer}
 .menu{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px}
 .menu .btn{padding:11px;font-size:13px;text-align:left}
 .danger{color:var(--coral)!important;border-color:#F0B7B1!important}
+#netBar{display:flex;flex-direction:column;gap:6px;width:100%}
+#netBar .nc{display:flex;flex-direction:column;align-items:flex-start;gap:1px;text-align:left;padding:5px 10px}
+#netBar .nc b{font-family:var(--mono);font-size:14px;color:var(--amber-deep)}
+#netBar .nc span{font-size:11px;color:var(--muted);font-weight:600}
+#netBar .reacts{display:grid;grid-template-columns:repeat(3,1fr);gap:5px}
+#netBar .reacts .btn{padding:5px 0;font-size:18px;line-height:1.2}
+.netgrid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.netbox{border:1.5px solid var(--line);border-radius:14px;padding:12px;display:flex;flex-direction:column;gap:10px;align-items:flex-start}
+.netbox p{margin:0;font-size:13px;color:var(--muted);line-height:1.5}
+#netHint{color:var(--coral);font-weight:700}
+.words{display:grid;grid-template-columns:repeat(4,1fr);gap:5px;width:100%}
+.words .btn{padding:7px 0;font-size:11px}
+.words .btn.on{background:var(--amber);border-color:var(--amber-deep);color:#241505}
+.netjoin{display:flex;gap:8px;width:100%}
+#netNum{font:700 20px var(--mono);width:4.4em;padding:5px 8px;border:1.5px solid var(--line);border-radius:10px;background:var(--paper);color:var(--ink);text-align:center}
+.neterr{background:#FDEDEB;border:1.5px solid #F0B7B1;border-radius:12px;padding:10px 12px;font-size:13px;line-height:1.5;margin-bottom:12px;word-break:break-word}
+.netcode{font:800 40px var(--mono);letter-spacing:.06em;text-align:center;color:var(--amber-deep);margin:4px 0 12px}
+.netlink{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.netlink code{font:12px var(--mono);background:var(--paper-2);padding:6px 8px;border-radius:8px;word-break:break-all;flex:1;min-width:0}
+@media (max-width:560px){.netgrid{grid-template-columns:1fr}}
 @media (max-width:720px){
   .hud{padding-top:calc(9px + env(safe-area-inset-top,0px));padding-left:calc(9px + env(safe-area-inset-left,0px));
     padding-right:calc(9px + env(safe-area-inset-right,0px));padding-bottom:calc(9px + env(safe-area-inset-bottom,0px))}
@@ -286,6 +306,10 @@ button{font:inherit;color:inherit;cursor:pointer}
     </div>
 
     <div id="mapWrap" class="plate">
+      <div id="netBar" hidden>
+        <button class="btn nc"><b id="netRoom"></b><span id="netInfo"></span></button>
+        <div class="reacts"><button class="btn" data-react="hi" aria-label="Привет">👋</button><button class="btn" data-react="yay" aria-label="Ура">🎉</button><button class="btn" data-react="honk" aria-label="Гудок">📣</button></div>
+      </div>
       <canvas id="mini" width="264" height="208"></canvas>
       <div class="btns">
         <button class="btn" id="btnView">Вид</button>
@@ -733,6 +757,7 @@ function sfx(kind){
   if(kind === "fail"){  blip(330, 0.16, "sawtooth", 0.18); blip(196, 0.34, "sawtooth", 0.18, 0.15); }
   if(kind === "ticket"){ blip(880, 0.14, "square", 0.2); blip(587, 0.14, "square", 0.2, 0.16); blip(392, 0.4, "square", 0.2, 0.32); }
   if(kind === "ui")     blip(720, 0.08, "triangle", 0.14);
+  if(kind === "honk"){  blip(392, 0.22, "square", 0.14); blip(494, 0.22, "square", 0.14); blip(392, 0.3, "square", 0.14, 0.28); blip(494, 0.3, "square", 0.14, 0.28); }
 }
 function audioFrame(){
   if(!SND.ctx) return;
@@ -1856,6 +1881,7 @@ function drawMini(){
     mx.fillStyle = Math.floor(clock*6)%2 ? "#2F6FD0" : "#D24437";
     mx.beginPath(); mx.arc(c.x*sx, c.y*sy, 4, 0, 6.283); mx.fill();
   }
+  netMini(sx, sy);
   mx.fillStyle = PAINTS[S.color].c; mx.strokeStyle = "#2B343A"; mx.lineWidth = 1.5;
   mx.beginPath(); mx.arc(car.x*sx, car.y*sy, 4, 0, 6.283); mx.fill(); mx.stroke();
 }
@@ -1864,6 +1890,7 @@ function drawMini(){
 const keys = {};
 const KMAP = {ArrowUp:"gas", KeyW:"gas", ArrowDown:"brake", KeyS:"brake", ArrowLeft:"left", KeyA:"left", ArrowRight:"right", KeyD:"right"};
 addEventListener("keydown", e=>{
+  if(e.target.closest && e.target.closest("input")) return;
   if(KMAP[e.code]){ keys[KMAP[e.code]] = true; e.preventDefault(); }
   if(e.code === "KeyC") nextView();
   if(e.code === "KeyM") toggleSound();
@@ -2014,6 +2041,7 @@ function finish(){
   const score = 5 - Math.min(2, o.crashes*0.6) - (late ? 1.2 : 0);
   S.rating = Math.max(1, Math.min(5, S.rating*0.85 + score*0.15));
   S.money += total; S.orders++; S.shiftOrders++; S.shiftMoney += total; S.stars += stars;
+  netRide();
   coins(); sfx("coin");
   const why = [late ? "опоздали" : "", o.crashes ? "авария" : "", o.reds ? "красный свет" : ""].filter(Boolean).join(", ");
   toast(`+${total.toLocaleString("ru-RU")} ж`, `счётчик ${fare} ж · чаевые ${tip} ж${S.dirt > 0.4 ? " · грязное такси" : ""}`);
@@ -2346,6 +2374,7 @@ function menuSheet(confirmReset){
       <button class="btn" data-crew>Водители</button>
       <button class="btn" data-sound>${SND.on ? "Выключить звук" : "Включить звук"}</button>
       <button class="btn" data-qual>Графика: ${QNAME[S.quality]}${S.quality === "auto" ? ` (${QNAME[qLevel]})` : ""}</button>
+      <button class="btn" data-netmenu>${NET.st === "on" ? "Комната " + roomName() : "Играть с друзьями"}</button>
       <button class="btn" data-hand>Закончить смену</button>
     </div>
     <div class="foot" style="flex-wrap:wrap">
@@ -2355,6 +2384,7 @@ function menuSheet(confirmReset){
     </div>`);
   bindModes(()=> menuSheet(false));
   sheet.querySelector("[data-garage]").onclick = garage;
+  sheet.querySelector("[data-netmenu]").onclick = netSheet;
   sheet.querySelector("[data-crew]").onclick = crew;
   sheet.querySelector("[data-sound]").onclick = ()=>{ toggleSound(); menuSheet(false); };
   sheet.querySelector("[data-qual]").onclick = ()=>{
@@ -2393,7 +2423,9 @@ function startSheet(){
     На телефоне — кнопки внизу экрана.<br>
     Бензин кончается — заезжай на заправку <b>З</b>. Такси пачкается — мойка <b>М</b>. Новый цвет — покраска <b>П</b>.</div>
     <div class="foot"><span class="label">${S.orders ? `в кассе ${fmt(S.money)} ж · ★ ${S.stars}` : "первая смена"}</span>
-    <button class="btn primary" data-go>${S.orders ? "Продолжить" : "Поехали!"}</button></div>`);
+    <span style="display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end"><button class="btn" data-net>${NET.st === "on" ? "Комната " + roomName() : "Играть с друзьями"}</button>
+    <button class="btn primary" data-go>${S.orders ? "Продолжить" : "Поехали!"}</button></span></div>`);
+  sheet.querySelector("[data-net]").onclick = netSheet;
   bindModes(startSheet);
   sheet.querySelector("[data-go]").onclick = ()=>{
     audioBoot();
@@ -2404,6 +2436,328 @@ function startSheet(){
   };
 }
 
+/* ---------- игра с друзьями: WebRTC через PeerJS, без своего сервера ----------
+   Хозяин комнаты держит связь со всеми гостями и пересылает их такси друг другу.
+   По сети ходят только такси (10 раз в секунду); город, машины и заказы у каждого свои. */
+const NET_WORDS = ["ЛИСА","ЁЖИК","СОВА","ЕНОТ","БОБР","ЗАЯЦ","МИШКА","КОТ"];
+const NET_PREFIX = "hvostograd-taxi-v1-";
+const NET_HOME = "https://alexsenchenko.github.io/hvostograd-taxi/";
+const NET_MAX = 6, NET_HZ = 10, NET_DELAY = 0.14, NET_QUIET = 7;
+const REACTS = {hi:{icon:"👋", text:"Привет!"}, yay:{icon:"🎉", text:"Ура!"}, honk:{icon:"📣", text:"Би-би!"}};
+const NET = {st:"off", peer:null, host:false, word:0, num:0, me:"", conns:[], hostConn:null, hostSeen:0,
+  others:new Map(), team:0, timer:0, tick:0, err:"", pickW:-1, lastReact:0};
+const nowS = ()=> performance.now()/1000;
+const roomName = ()=> NET_WORDS[NET.word] + "-" + NET.num;
+const roomId = (w, n)=> NET_PREFIX + w + "-" + n;
+const idx = (v, n)=> Math.max(0, Math.min(n - 1, v|0));
+
+function loadPeer(){
+  if(window.Peer || window.peerjs) return Promise.resolve();
+  return new Promise((ok, bad)=>{
+    const s = document.createElement("script");
+    s.src = "https://cdnjs.cloudflare.com/ajax/libs/peerjs/1.5.5/peerjs.min.js";
+    s.onload = ()=> (window.Peer || window.peerjs) ? ok() : bad(); s.onerror = bad;
+    document.head.appendChild(s);
+  });
+}
+const PeerCls = ()=> window.Peer || window.peerjs.Peer;
+
+function netWatch(sec, kind){
+  clearTimeout(NET.timer);
+  NET.timer = setTimeout(()=>{ if(NET.st === "connecting") netFail(kind); }, sec*1000);
+}
+function netReset(){
+  clearTimeout(NET.timer); clearInterval(NET.tick);
+  const p = NET.peer; NET.peer = null;
+  if(p) try{ p.destroy(); }catch(e){}
+  for(const id of [...NET.others.keys()]) netGone(id, true);
+  NET.conns = []; NET.hostConn = null; NET.hostSeen = 0; NET.st = "off"; NET.team = 0; NET.me = "";
+  netPaintBar();
+}
+function netFail(kind){
+  const room = roomName();
+  netReset();
+  NET.err = kind === "peer-unavailable" ? `Комнаты ${room} нет. Проверь слово и число — они видны у друга над картой.`
+    : kind === "full" ? `В комнате ${room} уже ${NET_MAX} такси — больше не помещается.`
+    : kind === "ice" ? "Не получилось соединиться: сеть не пускает. Так бывает с мобильным интернетом — попробуйте оба через Wi-Fi."
+    : `Нет связи с сервером знакомств. Играть с друзьями можно только по ссылке ${NET_HOME} и с интернетом.`;
+  if(!veil.hidden && sheet.querySelector("[data-netsheet]")) netSheet();
+  else toast("Не получилось подключиться", "играем одни", "");
+}
+function netLost(){
+  netReset();
+  toast("Комната закрылась", "играем одни");
+  if(!veil.hidden && sheet.querySelector("[data-netsheet]")) netSheet();
+}
+function netOpened(id){
+  clearTimeout(NET.timer); NET.st = "on"; NET.me = id; NET.err = ""; NET.hostSeen = nowS();
+  clearInterval(NET.tick); NET.tick = setInterval(netTick, 1000/NET_HZ);
+  netPaintBar();
+  if(!veil.hidden && sheet.querySelector("[data-netsheet]")) netSheet();
+}
+function netWatchPeer(peer){
+  peer.on("disconnected", ()=>{ if(NET.peer === peer && !peer.destroyed) try{ peer.reconnect(); }catch(e){} });
+}
+
+async function netHost(tries){
+  tries = tries || 0;
+  netReset(); NET.st = "connecting"; NET.host = true; NET.err = "";
+  NET.word = Math.floor(Math.random()*NET_WORDS.length); NET.num = 10 + Math.floor(Math.random()*90);
+  netSheet();
+  try{ await loadPeer(); }catch(e){ return netFail("lib"); }
+  if(NET.st !== "connecting") return;
+  let peer;
+  try{ peer = NET.peer = new (PeerCls())(roomId(NET.word, NET.num), {debug:0}); }catch(e){ return netFail("lib"); }
+  netWatch(12, "net");
+  peer.on("open", id=>{ if(NET.peer === peer) netOpened(id); });
+  peer.on("connection", c=>{ if(NET.peer === peer) netAccept(c); });
+  netWatchPeer(peer);
+  peer.on("error", e=>{
+    if(NET.peer !== peer) return;
+    if(e.type === "unavailable-id" && tries < 4) return netHost(tries + 1);
+    if(NET.st !== "on") netFail(e.type);
+  });
+}
+function netAccept(c){
+  c.on("open", ()=>{
+    if(NET.conns.length >= NET_MAX - 1){ c.send({t:"full"}); setTimeout(()=> c.close(), 400); return; }
+    NET.conns.push(c); c.send({t:"team", n:NET.team}); netPaintBar();
+  });
+  c.on("data", m=> netData(m, c));
+  c.on("close", ()=> netDrop(c));
+  c.on("error", ()=> netDrop(c));
+}
+function netDrop(c){
+  const i = NET.conns.indexOf(c); if(i < 0) return;
+  NET.conns.splice(i, 1); netGone(c.peer); netSend({t:"bye", id:c.peer}); netPaintBar();
+}
+
+async function netJoin(word, num){
+  netReset(); NET.st = "connecting"; NET.host = false; NET.err = ""; NET.word = word; NET.num = num;
+  netSheet();
+  try{ await loadPeer(); }catch(e){ return netFail("lib"); }
+  if(NET.st !== "connecting") return;
+  let peer;
+  try{ peer = NET.peer = new (PeerCls())({debug:0}); }catch(e){ return netFail("lib"); }
+  netWatch(15, "ice");
+  peer.on("open", ()=>{
+    if(NET.peer !== peer) return;
+    const c = NET.hostConn = peer.connect(roomId(word, num), {serialization:"json", reliable:true});
+    c.on("open", ()=>{
+      if(NET.hostConn !== c) return;
+      netOpened(peer.id);
+      toast("Ты в комнате " + roomName(), "друзья видят твоё такси", "good");
+    });
+    c.on("data", m=>{ if(NET.hostConn === c) netData(m, c); });
+    c.on("close", ()=>{ if(NET.hostConn === c && NET.st === "on") netLost(); });
+  });
+  netWatchPeer(peer);
+  peer.on("error", e=>{ if(NET.peer === peer && NET.st !== "on") netFail(e.type); });
+}
+
+function netSend(m){
+  if(NET.host){ for(const c of NET.conns) if(c.open) c.send(m); }
+  else if(NET.hostConn && NET.hostConn.open) NET.hostConn.send(m);
+}
+function netTick(){
+  if(NET.st !== "on") return;
+  netSend({t:"s", id:NET.me, x:Math.round(car.x*10)/10, y:Math.round(car.y*10)/10, a:Math.round(car.a*1000)/1000,
+    c:S.color, d:S.driver});
+  const now = nowS();
+  for(const [id, o] of NET.others) if(now - o.seen > NET_QUIET) netGone(id);
+  if(!NET.host && now - NET.hostSeen > NET_QUIET) netLost();
+}
+function netData(m, c){
+  if(!m || typeof m !== "object") return;
+  if(!NET.host) NET.hostSeen = nowS();
+  if(NET.host){
+    if(m.id !== c.peer) return;                                      // гость говорит только за себя
+    if(m.t === "s" || m.t === "r") for(const o of NET.conns) if(o !== c && o.open) o.send(m);
+  }
+  if(m.t === "s") netState(m);
+  else if(m.t === "r") netReact(m.id, m.k);
+  else if(m.t === "bye") netGone(m.id);
+  else if(m.t === "ride" && NET.host) netTeam(NET.team + 1);
+  else if(m.t === "team" && !NET.host){ NET.team = m.n|0; netPaintBar(); }
+  else if(m.t === "full" && !NET.host) netFail("full");
+}
+function netTeam(n){ NET.team = n; netSend({t:"team", n}); netPaintBar(); }
+function netRide(){
+  if(NET.st !== "on") return;
+  if(NET.host) netTeam(NET.team + 1); else netSend({t:"ride", id:NET.me});
+}
+
+/* --- чужие такси --- */
+function pill(text, border, fill, ink){
+  const cv = document.createElement("canvas"); cv.width = 256; cv.height = 72;
+  const x = cv.getContext("2d");
+  x.font = "800 34px system-ui, -apple-system, sans-serif";
+  const w = Math.min(244, x.measureText(text).width + 44), h = 56, x0 = (256 - w)/2, y0 = 8, r = h/2;
+  x.beginPath(); x.moveTo(x0 + r, y0); x.arcTo(x0 + w, y0, x0 + w, y0 + h, r); x.arcTo(x0 + w, y0 + h, x0, y0 + h, r);
+  x.arcTo(x0, y0 + h, x0, y0, r); x.arcTo(x0, y0, x0 + w, y0, r); x.closePath();
+  x.fillStyle = fill; x.fill(); x.lineWidth = 7; x.strokeStyle = border; x.stroke();
+  x.fillStyle = ink; x.textAlign = "center"; x.textBaseline = "middle"; x.fillText(text, 128, y0 + h/2 + 2);
+  const tex = new THREE.CanvasTexture(cv);
+  const sp = new THREE.Sprite(new THREE.SpriteMaterial({map:tex, depthTest:false, transparent:true}));
+  sp.scale.set(34, 9.6, 1); sp.renderOrder = 10;
+  return sp;
+}
+function dropSprite(sp){ if(!sp) return; sp.parent && sp.parent.remove(sp); sp.material.map.dispose(); sp.material.dispose(); }
+
+function netState(m){
+  if(m.id === NET.me || !isFinite(m.x) || !isFinite(m.y) || !isFinite(m.a)) return;
+  const d = idx(m.d, CREW.length), c = idx(m.c, PAINTS.length), now = nowS();
+  let o = NET.others.get(m.id);
+  if(!o){
+    if(NET.others.size >= NET_MAX) return;
+    o = {id:m.id, buf:[], seen:now, mesh:makeTaxi(), head:null, label:null, bubble:null, bubbleT:0, d:-1, c:-1, x:m.x, y:m.y};
+    o.mesh.traverse(p=>{ p.castShadow = false; });
+    o.mesh.position.set(m.x, 0, m.y);
+    for(const b of o.mesh.userData.night) b.visible = taxi.userData.night[0].visible;
+    scene.add(o.mesh); NET.others.set(m.id, o);
+    toast(`${CREW[d].name} в городе!`, "друг подключился", "good"); sfx("ui");
+  }
+  o.seen = now;
+  o.buf.push({t:now, x:m.x, y:m.y, a:m.a});
+  if(o.buf.length > 24) o.buf.shift();
+  if(o.d !== d){
+    if(o.head){ o.mesh.remove(o.head); freeHead(o.head); }
+    o.head = makeHead(CREW[d]); o.head.position.set(1.2, 14.8, -3.1); o.mesh.add(o.head);
+    o.d = d; o.c = -1;
+  }
+  if(o.c !== c){
+    const p = o.mesh.userData.paint;
+    p.body.color.set(PAINTS[c].c); p.hood.color.set(PAINTS[c].c).multiplyScalar(0.86);
+    dropSprite(o.label);
+    o.label = pill(CREW[d].name, PAINTS[c].c, "#FFFFFF", "#1F2A2E"); o.label.position.set(0, 30, 0); o.mesh.add(o.label);
+    o.c = c;
+  }
+  netPaintBar();
+}
+function netGone(id, quiet){
+  const o = NET.others.get(id); if(!o) return;
+  NET.others.delete(id);
+  scene.remove(o.mesh);
+  dropSprite(o.label); dropSprite(o.bubble);
+  if(o.head) freeHead(o.head);
+  for(const b of o.mesh.userData.night) b.geometry.dispose();
+  o.mesh.traverse(p=>{ if(p.material && p.material !== darkMat && p.material !== glassMat) p.material.dispose(); });
+  if(!quiet) toast(`${CREW[Math.max(0, o.d)].name} уехал домой`, "");
+  netPaintBar();
+}
+function bubble(k){
+  const r = REACTS[k], sp = pill(r.icon + " " + r.text, "#E8892B", "#FFF3E0", "#241505");
+  sp.scale.set(40, 11.3, 1); sp.position.set(0, 42, 0); return sp;
+}
+function netReactSend(k){
+  if(NET.st !== "on" || !REACTS[k] || nowS() - NET.lastReact < 0.8) return;
+  NET.lastReact = nowS();
+  netSend({t:"r", id:NET.me, k});
+  toast("Ты: " + REACTS[k].text, "друзья увидят над твоим такси");
+  sfx(k === "honk" ? "honk" : "ui");
+}
+function netReact(id, k){
+  const o = NET.others.get(id); if(!o || !REACTS[k]) return;
+  dropSprite(o.bubble); o.bubble = bubble(k); o.mesh.add(o.bubble); o.bubbleT = 2.6;
+  toast(`${CREW[Math.max(0, o.d)].name}: ${REACTS[k].text}`, "");
+  sfx(k === "honk" ? "honk" : "ui");
+}
+function netFrame(dt){
+  if(!NET.others.size) return;
+  const rt = nowS() - NET_DELAY, night = taxi.userData.night[0].visible;
+  for(const o of NET.others.values()){
+    const b = o.buf; if(!b.length) continue;
+    let s0 = b[0], s1 = b[0];
+    for(let i = b.length - 1; i >= 0; i--) if(b[i].t <= rt){ s0 = b[i]; s1 = b[i+1] || b[i]; break; }
+    const k = s1 === s0 ? 0 : Math.min(1, (rt - s0.t)/(s1.t - s0.t));
+    const da = Math.atan2(Math.sin(s1.a - s0.a), Math.cos(s1.a - s0.a));
+    o.x = s0.x + (s1.x - s0.x)*k; o.y = s0.y + (s1.y - s0.y)*k;
+    o.mesh.position.set(o.x, 0, o.y); o.mesh.rotation.y = -(s0.a + da*k);
+    for(const n of o.mesh.userData.night) n.visible = night;
+    if(o.bubble && (o.bubbleT -= dt) <= 0){ dropSprite(o.bubble); o.bubble = null; }
+  }
+}
+function netMini(sx, sy){
+  for(const o of NET.others.values()){
+    mx.fillStyle = PAINTS[Math.max(0, o.c)].c; mx.strokeStyle = "#FFFFFF"; mx.lineWidth = 2;
+    mx.beginPath(); mx.arc(o.x*sx, o.y*sy, 4.5, 0, 6.283); mx.fill(); mx.stroke();
+  }
+}
+
+/* --- панель и окно --- */
+function netPaintBar(){
+  const bar = el("netBar"); if(!bar) return;
+  bar.hidden = NET.st !== "on";
+  if(NET.st !== "on") return;
+  el("netRoom").textContent = roomName();
+  el("netInfo").textContent = `в городе ${NET.others.size + 1} · вместе ${NET.team} ${plural(NET.team, "поездка", "поездки", "поездок")}`;
+}
+function plural(n, a, b, c){ const t = n % 10, h = n % 100; return t === 1 && h !== 11 ? a : t >= 2 && t <= 4 && (h < 12 || h > 14) ? b : c; }
+function netLink(){ return location.origin + location.pathname + "?room=" + NET.word + "-" + NET.num; }
+
+function netSheet(){
+  const back = S.started ? null : startSheet;
+  const cont = S.started ? "На линию" : "Дальше";
+  let body;
+  if(NET.st === "on"){
+    const names = [CREW[S.driver].name + " (ты)", ...[...NET.others.values()].map(o=> CREW[Math.max(0, o.d)].name)].join(", ");
+    body = `<h2>Комната друзей</h2>
+      <div class="sub">${NET.host ? "Скажи друзьям слово и число — пусть нажмут «Играть с друзьями» и выберут «Комната друга»."
+        : "Ты в комнате друга."} Сейчас в городе: ${names}.</div>
+      <div class="netcode">${roomName()}</div>
+      <div class="netlink"><code id="netLinkText">${netLink()}</code><button class="btn" data-copy>Скопировать ссылку</button></div>
+      ${NET.host ? `<div class="sub" style="margin:4px 0 0">Ты хозяин комнаты: если закрыть игру, комната закроется у всех.</div>` : ""}
+      <div class="foot"><button class="btn danger" data-netoff>Выйти из комнаты</button><button class="btn primary" data-close>${cont}</button></div>`;
+  } else if(NET.st === "connecting"){
+    body = `<h2>Подключаюсь…</h2>
+      <div class="sub">${NET.host ? "Создаю комнату." : "Ищу комнату " + roomName() + "."} Это займёт несколько секунд.</div>
+      <div class="foot"><span></span><button class="btn" data-netoff>Отмена</button></div>`;
+  } else {
+    body = `<h2>Играть с друзьями</h2>
+      <div class="sub">Все катаются по одному городу и видят такси друг друга. Заказы у каждого свои, а поездки считаются вместе.</div>
+      ${NET.err ? `<div class="neterr">${NET.err}</div>` : ""}
+      <div class="netgrid">
+        <div class="netbox"><div class="label">новая комната</div>
+          <p>Ты хозяин. Друзья войдут по слову и числу, которые появятся на экране.</p>
+          <button class="btn primary" data-nethost>Создать комнату</button></div>
+        <div class="netbox"><div class="label">комната друга</div>
+          <div class="words">${NET_WORDS.map((w, i)=>`<button class="btn ${i === NET.pickW ? "on" : ""}" data-w="${i}">${w}</button>`).join("")}</div>
+          <div class="netjoin"><input id="netNum" inputmode="numeric" maxlength="2" placeholder="число" autocomplete="off">
+          <button class="btn primary" data-netjoin>Войти</button></div>
+          <p id="netHint" hidden></p></div>
+      </div>
+      <div class="foot"><span class="label">нужен интернет · чата нет, есть 👋 🎉 📣</span><button class="btn" data-close>Назад</button></div>`;
+  }
+  openSheet(`<div data-netsheet>${body}</div>`, back);
+  bindClose();
+  const q = s=> sheet.querySelector(s);
+  if(q("[data-netoff]")) q("[data-netoff]").onclick = ()=>{ netReset(); NET.err = ""; netSheet(); };
+  if(q("[data-nethost]")) q("[data-nethost]").onclick = ()=> netHost();
+  sheet.querySelectorAll("[data-w]").forEach(b=> b.onclick = ()=>{
+    NET.pickW = +b.dataset.w;
+    sheet.querySelectorAll("[data-w]").forEach(x=> x.classList.toggle("on", x === b));
+    el("netNum").focus();
+  });
+  if(q("[data-netjoin]")){
+    const go = ()=>{
+      const n = parseInt(el("netNum").value, 10), hint = el("netHint");
+      if(NET.pickW < 0){ hint.hidden = false; hint.textContent = "Выбери слово, как у друга."; return; }
+      if(!(n >= 10 && n <= 99)){ hint.hidden = false; hint.textContent = "Впиши число от 10 до 99, как у друга."; return; }
+      netJoin(NET.pickW, n);
+    };
+    q("[data-netjoin]").onclick = go;
+    el("netNum").onkeydown = e=>{ if(e.key === "Enter") go(); };
+  }
+  if(q("[data-copy]")) q("[data-copy]").onclick = e=>{
+    const b = e.currentTarget, done = ()=>{ b.textContent = "Скопировано"; };
+    try{ navigator.clipboard.writeText(netLink()).then(done, ()=> selectLink()); }catch(err){ selectLink(); }
+  };
+}
+function selectLink(){ const r = document.createRange(); r.selectNodeContents(el("netLinkText")); const s = getSelection(); s.removeAllRanges(); s.addRange(r); }
+el("netRoom").parentElement.onclick = netSheet;
+document.querySelectorAll("#netBar [data-react]").forEach(b=> b.onclick = ()=> netReactSend(b.dataset.react));
+addEventListener("pagehide", ()=>{ if(NET.peer) try{ NET.peer.destroy(); }catch(e){} });
+
 /* ---------- цикл ---------- */
 let last = performance.now();
 function loop(t){
@@ -2411,7 +2765,7 @@ function loop(t){
   watchPerf(raw);
   if(!S.paused && S.started) update(dt);
   else clock += dt;                                  // светофоры и мигалки живут и на паузе
-  syncScene(dt); drawMini(); paintLive(); audioFrame();
+  syncScene(dt); netFrame(dt); drawMini(); paintLive(); audioFrame();
   renderer.render(scene, camera);
   requestAnimationFrame(loop);
 }
@@ -2420,6 +2774,8 @@ for(let i=0;i<MAX_TRAFFIC;i++) spawnTraffic();
 updatePeds(0);
 ensureDaily(); applyTaxiColor();
 paintHUD(); paintOrder(); startSheet();
+{ const m = /^(\d)-(\d\d)$/.exec(new URLSearchParams(location.search).get("room") || "");   // ссылка-приглашение
+  if(m && +m[1] < NET_WORDS.length && +m[2] >= 10){ NET.pickW = +m[1]; netJoin(+m[1], +m[2]); } }
 requestAnimationFrame(loop);
 </script>
 
