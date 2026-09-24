@@ -155,6 +155,93 @@ button{font:inherit;color:inherit;cursor:pointer}
   #meter .tariff{display:none}
   #meter .clk{display:none}
 }
+.hud{padding-top:calc(14px + env(safe-area-inset-top,0px));padding-left:calc(14px + env(safe-area-inset-left,0px));
+  padding-right:calc(14px + env(safe-area-inset-right,0px));padding-bottom:calc(14px + env(safe-area-inset-bottom,0px))}
+#svcChip{position:absolute;left:50%;top:calc(132px + env(safe-area-inset-top,0px));transform:translateX(-50%);z-index:3;pointer-events:none;
+  display:flex;align-items:center;gap:10px;padding:8px 16px;border-radius:999px;
+  background:rgba(255,255,255,.95);border:2px solid var(--svc,#E4574B);box-shadow:0 6px 18px rgba(31,54,54,.16)}
+#svcChip .txt{font-size:13px;font-weight:800}
+#svcChip .hbar{width:110px;height:7px;border-radius:4px;background:#E3EAE6;overflow:hidden}
+#svcChip .hbar i{display:block;height:100%;width:0%;background:var(--svc,#E4574B);transition:width .15s linear}
+#purse .gold b{color:var(--amber-deep)}
+.gauges{display:flex;flex-direction:column;gap:6px;border-left:1px solid var(--line);padding-left:14px;min-width:96px}
+.gauge .label{display:block;margin-bottom:2px}
+.gauge .bar{display:block;margin-top:0;height:7px}
+.gauge.warn .bar i{background:linear-gradient(90deg,var(--coral),#EE9B2E)}
+.gauge.warn .label{color:var(--coral)}
+#fuelBar{background:linear-gradient(90deg,#E4574B,#F2A93C 30%,var(--leaf))}
+#cleanBar{background:linear-gradient(90deg,#9C8058,#7EC8E3)}
+.badge{display:inline-block;min-width:26px;padding:1px 5px;border-radius:999px;background:var(--amber);color:#241505;font-size:10px;font-family:var(--mono);margin-left:2px}
+.badge.done{background:var(--leaf);color:#fff}
+#starPop{position:absolute;left:50%;top:46%;transform:translate(-50%,-50%);z-index:4;pointer-events:none;text-align:center}
+#starPop .st{font-size:64px;letter-spacing:6px;line-height:1;color:#F2B63C;
+  text-shadow:0 3px 0 #C97A16,0 8px 22px rgba(31,54,54,.35);animation:starIn .5s cubic-bezier(.2,1.6,.4,1)}
+#starPop .st i{font-style:normal;color:rgba(255,255,255,.75);text-shadow:0 3px 0 #9FB0AE}
+#starPop .why{display:inline-block;margin-top:8px;background:var(--paper);border-radius:999px;padding:5px 14px;font-weight:800;font-size:13px;color:var(--muted)}
+@keyframes starIn{from{transform:scale(.2) rotate(-12deg);opacity:0}to{transform:none;opacity:1}}
+.tst.sticker{display:flex;align-items:center;gap:10px;border-width:2px;text-align:left}
+.tst.sticker svg{width:40px;height:40px;flex:none}
+.tst.good{border-color:var(--leaf);color:#2E7A45}
+.modes{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:4px 0 16px}
+.mode{border:2px solid var(--line);border-radius:14px;padding:12px;background:var(--paper-2);text-align:left;display:flex;flex-direction:column;gap:4px}
+.mode b{font-family:var(--display);font-weight:600;font-size:14px}
+.mode span{font-size:12px;color:var(--muted);line-height:1.45}
+.mode.on{border-color:var(--amber);background:#FFF3E0}
+.mode:focus-visible{outline:2px solid var(--amber);outline-offset:2px}
+.album{display:grid;grid-template-columns:repeat(auto-fill,minmax(96px,1fr));gap:10px}
+.album .s{border:2px dashed var(--line);border-radius:14px;padding:8px 6px;text-align:center;background:var(--paper-2);display:flex;flex-direction:column;align-items:center;gap:4px}
+.album .s.on{border-style:solid;border-color:var(--amber);background:#FFF8EC}
+.album .s svg{width:60px;height:60px}
+.album .s.off svg{filter:grayscale(1) brightness(1.35);opacity:.45}
+.album .s b{font-size:12px}
+.tasks{display:flex;flex-direction:column;gap:8px}
+.task{display:grid;grid-template-columns:1fr auto;gap:6px 14px;align-items:center;padding:12px 14px;border:1px solid var(--line);border-radius:12px;background:var(--paper-2)}
+.task .nm{font-weight:800;font-size:14px}
+.task .rw{font-family:var(--mono);font-weight:700;color:var(--amber-deep);font-size:13px}
+.task .bar{grid-column:1 / -1;margin-top:0;height:7px}
+.task.done{background:#EAF5EC;border-color:#A9D3B2}
+.task.done .rw{color:#2E7A45}
+.swatches{display:grid;grid-template-columns:repeat(5,1fr);gap:10px}
+.sw{border:2px solid var(--line);border-radius:14px;padding:10px 4px 8px;background:var(--paper-2);display:flex;flex-direction:column;align-items:center;gap:6px;font-size:11px;font-weight:700}
+.sw i{width:38px;height:38px;border-radius:50%;box-shadow:inset 0 -5px 0 rgba(0,0,0,.18),0 2px 6px rgba(0,0,0,.15)}
+.sw.on{border-color:var(--ink)}
+.sw[disabled]{opacity:.45;cursor:not-allowed}
+.menu{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px}
+.menu .btn{padding:11px;font-size:13px;text-align:left}
+.danger{color:var(--coral)!important;border-color:#F0B7B1!important}
+@media (max-width:720px){
+  .hud{padding-top:calc(9px + env(safe-area-inset-top,0px));padding-left:calc(9px + env(safe-area-inset-left,0px));
+    padding-right:calc(9px + env(safe-area-inset-right,0px));padding-bottom:calc(9px + env(safe-area-inset-bottom,0px))}
+  .gauges{min-width:72px;padding-left:10px}
+  #starPop .st{font-size:48px}
+  .swatches{grid-template-columns:repeat(5,1fr);gap:6px}
+  .sw i{width:30px;height:30px}
+  .hud{grid-template-columns:minmax(0,1fr) auto;grid-template-rows:auto auto 1fr auto;
+    grid-template-areas:"order order" "driver purse" ". ." "meter map"}
+  #orderCard{justify-self:stretch;max-width:none}
+  #driverChip{align-self:start;justify-self:start;padding:4px 12px 4px 4px;gap:7px;max-width:100%}
+  #driverChip svg{width:36px;height:36px}
+  #driverChip .nm{font-size:12px}
+  #purse{align-self:start;justify-self:end;text-align:right}
+  #purse .row{justify-content:flex-end;gap:10px}
+  #purse .money{font-size:18px}
+  #nextUp{display:none}
+  #meter{gap:12px;padding:8px 11px;min-width:0}
+  #meter .fare .v{font-size:20px}
+  #meter .spd{display:none}
+  #mapWrap{padding:6px;gap:6px;width:min(176px,46vw)}
+  #mini{width:100%;height:auto;aspect-ratio:132/104}
+  .btns{display:grid;grid-template-columns:1fr 1fr;gap:5px;width:100%}
+  .btns .btn{padding:6px 4px;font-size:11px;text-align:center}
+  #toast{top:calc(150px + env(safe-area-inset-top,0px));width:calc(100% - 24px)}
+  .tst{white-space:normal;max-width:100%}
+  #svcChip{top:auto;bottom:calc(250px + env(safe-area-inset-bottom,0px))}
+  #starPop{top:46%}
+}
+@media (pointer:coarse){
+  #touch{bottom:calc(12px + env(safe-area-inset-bottom,0px));padding-left:calc(12px + env(safe-area-inset-left,0px));padding-right:calc(12px + env(safe-area-inset-right,0px))}
+  .hud{padding-bottom:calc(100px + env(safe-area-inset-bottom,0px))}
+}
 @media (prefers-reduced-motion:reduce){*{animation-duration:.01ms!important;transition-duration:.01ms!important}}
 </style>
 
@@ -172,9 +259,11 @@ button{font:inherit;color:inherit;cursor:pointer}
 
     <div id="heatChip" hidden><span class="siren"></span><span class="txt" id="heatText">Патруль на хвосте</span><span class="hbar"><i id="heatBar"></i></span></div>
 
+    <div id="svcChip" hidden><span class="txt" id="svcText">Заправка</span><span class="hbar"><i id="svcBar"></i></span></div>
+
     <div id="purse" class="plate">
       <div class="money"><span id="moneyText">0</span> ж</div>
-      <div class="row"><span>★ <b id="ratingText">5.00</b></span><span>заказов <b id="ordersText">0</b></span><span>срыв <b id="failsText">0</b></span></div>
+      <div class="row"><span class="gold">★ <b id="starsText">0</b></span><span>рейтинг <b id="ratingText">5.00</b></span><span>заказов <b id="ordersText">0</b></span><span id="failsBox">срыв <b id="failsText">0</b></span></div>
       <div id="nextUp">
         <div class="label"><span>новый водитель</span><span id="nextUpN">через 10</span></div>
         <div class="bar"><i id="nextUpBar" style="width:0%"></i></div>
@@ -185,7 +274,10 @@ button{font:inherit;color:inherit;cursor:pointer}
       <div class="fare"><div class="label">счётчик</div><div class="v"><span id="fareText">0</span> ж</div></div>
       <div class="spd"><div class="label">скорость</div><div class="v"><span id="speedText">0</span> км/ч</div></div>
       <div class="clk"><div class="label">время</div><div class="v" id="clockText">11:00</div></div>
-      <div class="tariff">посадка 20 ж<br>тариф 24 ж / 100 м</div>
+      <div class="gauges">
+        <div class="gauge" id="fuelG"><span class="label">бак</span><span class="bar"><i id="fuelBar" style="width:100%"></i></span></div>
+        <div class="gauge" id="dirtG"><span class="label">блеск</span><span class="bar"><i id="cleanBar" style="width:100%"></i></span></div>
+      </div>
     </div>
 
     <div id="touch">
@@ -197,14 +289,15 @@ button{font:inherit;color:inherit;cursor:pointer}
       <canvas id="mini" width="264" height="208"></canvas>
       <div class="btns">
         <button class="btn" id="btnView">Вид</button>
-        <button class="btn" id="btnGarage">Гараж</button>
-        <button class="btn" id="btnCrew">Парк</button>
-        <button class="btn" id="btnSound">Звук</button>
+        <button class="btn" id="btnTasks">Задания <span class="badge" id="taskBadge">0/3</span></button>
+        <button class="btn" id="btnAlbum">Альбом</button>
+        <button class="btn" id="btnMenu">Меню</button>
       </div>
     </div>
   </div>
 
   <div id="toast"></div>
+  <div id="starPop" aria-live="polite"></div>
   <div id="veil"><div class="sheet" id="sheet"></div></div>
 </div>
 
@@ -246,23 +339,42 @@ const UPGRADES = [
 const MAXLVL = 6;
 const cost = (u,l)=> Math.round(u.base * Math.pow(1.75,l) / 5) * 5;
 
+/* краски для такси: первая — фирменный янтарь */
+const PAINTS = [
+  {name:"Янтарь", c:"#F2A93C"}, {name:"Малина", c:"#E4476B"}, {name:"Лайм", c:"#8BCB3C"}, {name:"Небо", c:"#4BA3E0"},
+  {name:"Сирень", c:"#A36BD6"}, {name:"Мята", c:"#3CC6A8"}, {name:"Апельсин", c:"#F57C2B"}, {name:"Лимон", c:"#F2D43C"},
+  {name:"Фламинго", c:"#F29BC4"}, {name:"Графит", c:"#4A5560"}
+];
+const PAINT_COST = 50;
+
 const S = {
   money:0, orders:0, rating:5, driver:0, unlocked:1,
   up:{motor:0,boost:0,tyres:0,meterUp:0,charm:0},
   started:false, paused:true, order:null, lastBump:-9,
   fails:0, shiftMoney:0, shiftOrders:0, shiftFails:0,
-  record:{money:0, orders:0}, muted:false
+  record:{money:0, orders:0}, muted:false,
+  mode:"calm", color:0, fuel:1, dirt:0, stars:0, album:{}, daily:null
 };
 const SAVE = "hvostograd-taxi-3d-v1";
 function save(){ try{ localStorage.setItem(SAVE, JSON.stringify({money:S.money,orders:S.orders,rating:S.rating,driver:S.driver,
-  unlocked:S.unlocked,up:S.up,fails:S.fails,record:S.record,muted:S.muted})); }catch(e){} }
+  unlocked:S.unlocked,up:S.up,fails:S.fails,record:S.record,muted:S.muted,
+  mode:S.mode,color:S.color,fuel:S.fuel,dirt:S.dirt,stars:S.stars,album:S.album,daily:S.daily})); }catch(e){} }
+const num = (v, lo, hi, def)=> (typeof v === "number" && isFinite(v)) ? Math.max(lo, Math.min(hi, v)) : def;
 function load(){ try{ const r=localStorage.getItem(SAVE); if(!r) return; const d=JSON.parse(r);
-  if(d && typeof d.money==="number"){ S.money=d.money; S.orders=d.orders|0; S.rating=d.rating||5;
+  if(d && typeof d.money==="number"){ S.money=num(d.money,0,1e9,0); S.orders=num(d.orders,0,1e7,0)|0; S.rating=num(d.rating,1,5,5);
     S.unlocked=Math.max(1,Math.min(d.unlocked|0||1,CREW.length));
-    S.driver=Math.max(0,Math.min(d.driver|0,S.unlocked-1)); Object.assign(S.up,d.up||{});
-    S.fails=d.fails|0; S.muted=!!d.muted;
-    if(d.record && typeof d.record.money==="number") S.record={money:d.record.money|0, orders:d.record.orders|0}; } }catch(e){} }
+    S.driver=Math.max(0,Math.min(d.driver|0,S.unlocked-1));
+    if(d.up && typeof d.up === "object") for(const k in S.up) S.up[k] = num(d.up[k],0,MAXLVL,0)|0;
+    S.fails=num(d.fails,0,1e7,0)|0; S.muted=!!d.muted;
+    if(d.record && typeof d.record.money==="number") S.record={money:d.record.money|0, orders:d.record.orders|0};
+    S.mode = d.mode === "patrol" ? "patrol" : "calm";
+    S.color = num(d.color,0,PAINTS.length-1,0)|0;
+    S.fuel = num(d.fuel,0,1,1); S.dirt = num(d.dirt,0,1,0);
+    S.stars = num(d.stars,0,1e7,0)|0;
+    if(d.album && typeof d.album === "object") for(const k in d.album) if(d.album[k]) S.album[k] = true;
+    if(d.daily && typeof d.daily === "object" && typeof d.daily.date === "string" && Array.isArray(d.daily.list)) S.daily = d.daily; } }catch(e){} }
 load();
+const calm = ()=> S.mode === "calm";
 
 /* ---------- генерация города ---------- */
 function mulberry32(a){ return function(){ a|=0; a=a+0x6D2B79F5|0; let t=Math.imul(a^a>>>15,1|a); t=t+Math.imul(t^t>>>7,61|t)^t; return ((t^t>>>14)>>>0)/4294967296; }; }
@@ -297,6 +409,22 @@ for(let gy=0; gy<GH; gy++){
   }
 }
 
+/* станции: заправки, мойка, покраска — на месте фасадов вдоль верхней улицы квартала */
+const STATIONS = [
+  {kind:"fuel",  gx:2, gy:2, name:"Заправка", sign:"ЗАПРАВКА", col:"#E4574B", letter:"З"},
+  {kind:"wash",  gx:6, gy:2, name:"Мойка",    sign:"МОЙКА",    col:"#3C8FD8", letter:"М"},
+  {kind:"paint", gx:3, gy:5, name:"Покраска", sign:"ПОКРАСКА", col:"#A36BD6", letter:"П"},
+  {kind:"fuel",  gx:7, gy:5, name:"Заправка", sign:"ЗАПРАВКА", col:"#E4574B", letter:"З"}
+];
+for(const st of STATIONS){
+  const b = blocks[st.gy][st.gx];
+  b.park = false; b.station = st;
+  b.buildings = b.buildings.filter(bd => bd.y > b.oy + 110);
+  b.trees = b.trees.filter(t => t.y > b.oy + 120);
+  b.buildings.push({x:b.ox+34, y:b.oy+44, w:BLOCK-68, h:56, ht:30, face:"#F4EEE2", roof:st.col, station:true});
+  st.x = b.ox + BLOCK/2; st.y = b.oy - 18;            // площадка у бордюра верхней улицы
+}
+
 /* окна: маленькие коробочки, чуть выступающие из фасада — зажигаются ночью */
 const WINDOWS = [];
 for(let gy=0; gy<GH; gy++) for(let gx=0; gx<GW; gx++) for(const bd of blocks[gy][gx].buildings){
@@ -318,6 +446,12 @@ function blockAt(x,y){
   if(gx<0||gy<0||gx>=GW||gy>=GH) return null;
   if(x - gx*CELL - ROAD < 0 || y - gy*CELL - ROAD < 0) return null;
   return blocks[gy][gx];
+}
+function camBlocked(x,y){
+  if(x<0||y<0||x>WW||y>WH) return true;
+  const gx = Math.floor(x/CELL), gy = Math.floor(y/CELL);
+  const lx = x - gx*CELL - ROAD, ly = y - gy*CELL - ROAD;
+  return gx<GW && gy<GH && lx > 10 && ly > 10 && lx < BLOCK - 10 && ly < BLOCK - 10;
 }
 function solid(x,y){
   if(x<8||y<8||x>WW-8||y>WH-8) return true;
@@ -441,6 +575,7 @@ function updateCops(dt){
   }
 }
 function addHeat(n, why, sub){
+  if(calm()) return;                                  // в спокойном режиме патруля нет
   const was = heat;
   heat = Math.min(120, heat + n); lastViol = clock;
   if(why && clock - lastHit > 1.1){ lastHit = clock; toast(why, sub); }
@@ -448,6 +583,7 @@ function addHeat(n, why, sub){
   if(heat >= 100 && cops.length < 2) spawnCop();
 }
 function ticket(){
+  if(calm()){ clearCops(); heat = 0; return; }
   const fine = Math.max(30, Math.round(S.money*0.12));
   S.money = Math.max(0, S.money - fine);
   S.rating = Math.max(1, S.rating - 0.25);
@@ -458,26 +594,49 @@ function ticket(){
 }
 
 /* ---------- заказы ---------- */
+/* точка у бордюра: машина встаёт в ближнюю к тротуару полосу, пассажир ждёт на тротуаре */
+const rr = (a,b)=> a + Math.random()*(b-a);
+const ri = (a,b)=> Math.floor(rr(a,b+1));
 function roadPoint(){
   if(Math.random() < 0.5){                                   // вертикальная улица
-    const i = RI(0,GW), gy = RI(0,GH-1);
-    return {x: i*CELL + ROAD/2 + R(-14,14), y: gy*CELL + ROAD + R(24, BLOCK-24),
-      street: STREET_V[i], house: gy*20 + (i%2 ? RI(1,9)*2-1 : RI(1,9)*2)};
+    const i = ri(0,GW), gy = ri(0,GH-1);
+    const side = i === 0 ? 1 : i === GW ? -1 : (Math.random() < 0.5 ? -1 : 1);
+    const cx = roadX(i), y = gy*CELL + ROAD + rr(24, BLOCK-24);
+    return {x: cx + side*15, y, sx: cx + side*(ROAD/2 + 3), sy: y, face: side > 0 ? Math.PI : 0,
+      street: STREET_V[i], house: gy*20 + (i%2 ? ri(1,9)*2-1 : ri(1,9)*2)};
   }
-  const j = RI(0,GH), gx = RI(0,GW-1);                        // поперечная
-  return {x: gx*CELL + ROAD + R(24, BLOCK-24), y: j*CELL + ROAD/2 + R(-14,14),
-    street: STREET_H[j], house: gx*20 + (j%2 ? RI(1,9)*2-1 : RI(1,9)*2)};
+  const j = ri(0,GH), gx = ri(0,GW-1);                        // поперечная
+  const side = j === 0 ? 1 : j === GH ? -1 : (Math.random() < 0.5 ? -1 : 1);
+  const cy = roadY(j), x = gx*CELL + ROAD + rr(24, BLOCK-24);
+  return {x, y: cy + side*15, sx: x, sy: cy + side*(ROAD/2 + 3), face: side > 0 ? Math.PI/2 : -Math.PI/2,
+    street: STREET_H[j], house: gx*20 + (j%2 ? ri(1,9)*2-1 : ri(1,9)*2)};
 }
-const PASSENGERS = ["барсук","выдра","хорёк","бобр","ёж","як","тапир","лемур","альпака","пингвин","сурок","лань"];
+/* 12 видов пассажиров — они же наклейки в альбоме */
+const PASSENGERS = [
+  {who:"барсук",  fur:"#8F959B", fur2:"#F4F4F0", ear:"round", nose:"#2A2220", mask:true},
+  {who:"выдра",   fur:"#8A6448", fur2:"#DCC5A8", ear:"tiny",  nose:"#2A2220"},
+  {who:"хорёк",   fur:"#D2B48C", fur2:"#F6EBDA", ear:"round", nose:"#C86F6F", mask:true},
+  {who:"бобр",    fur:"#8A5A36", fur2:"#C99A6E", ear:"tiny",  nose:"#2A2220"},
+  {who:"ёж",      fur:"#8C735C", fur2:"#F0DCC0", ear:"round", nose:"#2A2220", spots:true},
+  {who:"як",      fur:"#5E4A3E", fur2:"#B39C86", ear:"point", nose:"#2A2220"},
+  {who:"тапир",   fur:"#454B58", fur2:"#E8E4DC", ear:"round", nose:"#2A2220"},
+  {who:"лемур",   fur:"#9DA3A8", fur2:"#F2F2EE", ear:"round", nose:"#2A2220", mask:true},
+  {who:"альпака", fur:"#F1E2C8", fur2:"#FFF8EC", ear:"point", nose:"#6B4C3A"},
+  {who:"пингвин", fur:"#2E3440", fur2:"#F6F6F2", ear:"tiny",  nose:"#F2A93C"},
+  {who:"сурок",   fur:"#B8875A", fur2:"#E9CFA9", ear:"tiny",  nose:"#2A2220"},
+  {who:"лань",    fur:"#C98D55", fur2:"#F4E1C6", ear:"point", nose:"#2A2220"}
+];
 function newOrder(){
   let a = roadPoint(), g1 = 0;
   while(Math.hypot(a.x-car.x, a.y-car.y) > 950 && g1++ < 40) a = roadPoint();   // подача — в своём районе
   let b = roadPoint(), g2 = 0;
   while(Math.hypot(a.x-b.x, a.y-b.y) < 700 && g2++ < 40) b = roadPoint();
-  S.order = {phase:"pickup", from:a, to:b, who:PASSENGERS[RI(0,PASSENGERS.length-1)],
-    fur:PAX_FUR[RI(0,PAX_FUR.length-1)], ridden:0, crashes:0, late:0, patience:1, patMax:1};
+  const kind = Math.floor(Math.random()*PASSENGERS.length);
+  S.order = {phase:"pickup", from:a, to:b, kind, who:PASSENGERS[kind].who,
+    ridden:0, crashes:0, reds:0, late:0, lateP:false, patience:1, patMax:1};
   setPatience();
   paintOrder();
+  showWaiting();
 }
 /* запас времени — по кварталам, которые ещё предстоит намотать, а не по длине поездки */
 function setPatience(){
@@ -924,10 +1083,11 @@ function makeHead(a){
 function makeTaxi(){
   const g = new THREE.Group();
   g.add(part(BOXG, darkMat, 25, 3.4, 12.5, 0, 2.6, 0));                                   // рама
-  g.add(part(BOXG, new THREE.MeshLambertMaterial({color:"#F2A93C"}), 27, 8.6, 14, 0, 7.2, 0));
+  const body = new THREE.MeshLambertMaterial({color:"#F2A93C"}), hood = new THREE.MeshLambertMaterial({color:"#D98E22"});
+  g.add(part(BOXG, body, 27, 8.6, 14, 0, 7.2, 0));
   g.add(part(BOXG, new THREE.MeshLambertMaterial({color:"#FBFBF6"}), 13, 2.6, 14.3, -1, 6.6, 0)); // шашечная полоса
   g.add(part(BOXG, darkMat, 15, 3, 11.4, -3, 11.4, 0));                                   // открытый салон
-  g.add(part(BOXG, new THREE.MeshLambertMaterial({color:"#D98E22"}), 6, 4, 14, 9, 12, 0)); // капот
+  g.add(part(BOXG, hood, 6, 4, 14, 9, 12, 0));                                           // капот
   const ws = part(BOXG, glassMat, 0.9, 6.4, 12.4, 5.4, 14.4, 0);
   ws.rotation.z = 0.32; g.add(ws);                                                         // лобовое стекло
   g.add(part(BOXG, darkMat, 1.8, 7, 12.4, -11, 14.6, 0));                                 // дуга за спиной
@@ -944,32 +1104,87 @@ function makeTaxi(){
   for(const z of [-5.2, 5.2]) g.add(part(BOXG, new THREE.MeshBasicMaterial({color:"#C4453A"}), 1.2, 2.4, 3.4, -13.6, 8.6, z));
   g.userData.night = night;
 
-  const pax = makeHead({fur:"#E6ECEF", fur2:"#FFFFFF", ear:"round", nose:"#2A3238"});
-  pax.position.set(-5.8, 14.6, 3.1); pax.scale.setScalar(0.88); pax.visible = false;
-  g.add(pax);
+  const mudMat = new THREE.MeshLambertMaterial({color:"#6E5A3E"}), mud = [];
+  for(const [x, y, z, s] of [[-8,5,7.1,2.6],[4,4.4,7.1,2],[10,6,-7.1,2.4],[-4,6.4,-7.1,3],[-12,4,-7.1,1.8],[11,4.2,7.1,1.7]]){
+    const m = new THREE.Mesh(SPH, mudMat); m.position.set(x, y, z); m.userData.s = s; m.visible = false;
+    g.add(m); mud.push(m);
+  }
   wheels(g);
-  g.userData.pax = pax;
+  g.userData.paint = {body, hood}; g.userData.mud = mud;
   return g;
 }
 const taxi = makeTaxi();
 scene.add(taxi);
 
+/* --- звери: одна склеенная геометрия с цветами вершин на каждого — один вызов отрисовки --- */
+const SPL = new THREE.SphereGeometry(1, 10, 8), CNL = new THREE.ConeGeometry(1, 1, 6), CYLL = new THREE.CylinderGeometry(1, 1, 1, 8);
+const _mm = new THREE.Matrix4(), _mq = new THREE.Quaternion(), _me = new THREE.Euler(), _mc = new THREE.Color();
+const _mp = new THREE.Vector3(), _ms = new THREE.Vector3();
+function mergeParts(parts){
+  const pos = [], nor = [], col = [];
+  for(const [geo, color, sx, sy, sz, px, py, pz, rx, rz] of parts){
+    const g = geo.toNonIndexed();
+    _me.set(rx || 0, 0, rz || 0); _mq.setFromEuler(_me);
+    _mm.compose(_mp.set(px, py, pz), _mq, _ms.set(sx, sy, sz));
+    g.applyMatrix4(_mm);
+    const P = g.attributes.position.array, N = g.attributes.normal.array;
+    for(let i=0;i<P.length;i++){ pos.push(P[i]); nor.push(N[i]); }
+    _mc.set(color);
+    for(let i=0;i<P.length/3;i++) col.push(_mc.r, _mc.g, _mc.b);
+    g.dispose();
+  }
+  const out = new THREE.BufferGeometry();
+  out.setAttribute("position", new THREE.Float32BufferAttribute(pos, 3));
+  out.setAttribute("normal", new THREE.Float32BufferAttribute(nor, 3));
+  out.setAttribute("color", new THREE.Float32BufferAttribute(col, 3));
+  out.computeBoundingSphere();
+  return out;
+}
+/* зверь смотрит вдоль +x, лапы на y = 0 */
+function animalParts(a, coat, oneArm){
+  const p = [
+    [CYLL, a.fur, 1.1, 3.2, 1.1, 0, 1.6, -1.4], [CYLL, a.fur, 1.1, 3.2, 1.1, 0, 1.6, 1.4],
+    [SPL, coat, 2.9, 3.7, 2.9, 0, 6.2, 0],
+    [SPL, a.fur2, 1.5, 2.3, 2.0, 1.6, 5.8, 0],
+    [SPL, a.fur, 1.0, 1.0, 1.0, -2.9, 4.6, 0],
+    [SPL, a.fur, 0.9, 2.4, 0.9, 0.4, 6.2, -2.9, 0.28, 0],
+    [SPL, a.fur, 2.8, 2.7, 2.8, 0.3, 11.8, 0],
+    [SPL, a.fur2, 1.4, 1.15, 1.6, 2.4, 11.1, 0],
+    [SPL, a.nose, 0.5, 0.45, 0.6, 3.75, 11.4, 0]
+  ];
+  if(!oneArm) p.push([SPL, a.fur, 0.9, 2.4, 0.9, 0.4, 6.2, 2.9, -0.28, 0]);
+  if(a.mask) p.push([SPL, "#3A464E", 0.9, 0.95, 2.7, 2.0, 12.4, 0]);
+  if(a.spots) for(let i=0;i<5;i++){ const an = i/5*6.283; p.push([SPL, "#6B4C22", 0.45, 0.45, 0.45, -0.6 + Math.cos(an)*1.2, 13.6, Math.sin(an)*1.9]); }
+  for(const z of [-1.1, 1.1]){
+    p.push([SPL, "#1B282C", 0.42, 0.55, 0.42, 2.45, 12.5, z]);
+    p.push([SPL, "#FFFFFF", 0.16, 0.16, 0.16, 2.8, 12.75, z*0.86]);
+  }
+  for(const z of [-1, 1]){
+    if(a.ear === "round") p.push([SPL, a.fur, 1.0, 1.0, 0.6, 0, 14.1, z*1.9]);
+    if(a.ear === "point") p.push([CNL, a.fur, 0.9, 2.3, 0.9, 0, 14.6, z*1.5, z*0.32, 0]);
+    if(a.ear === "tuft")  p.push([CNL, a.fur, 0.7, 1.9, 0.7, 0.3, 14.4, z*1.4, z*0.45, 0]);
+    if(a.ear === "tiny")  p.push([SPL, a.fur, 0.6, 0.6, 0.45, 0, 13.5, z*2.2]);
+  }
+  return p;
+}
+const animalMat = new THREE.MeshLambertMaterial({vertexColors:true});
+const GEO_CACHE = new Map();
+function animalGeo(a, coat, oneArm){
+  const k = a.who + "|" + coat + "|" + (oneArm ? 1 : 0);
+  if(!GEO_CACHE.has(k)) GEO_CACHE.set(k, mergeParts(animalParts(a, coat, oneArm)));
+  return GEO_CACHE.get(k);
+}
+const ARM_CACHE = new Map();
+function armGeo(a){
+  if(!ARM_CACHE.has(a.who)) ARM_CACHE.set(a.who, mergeParts([[SPL, a.fur, 0.9, 2.4, 0.9, 0, -2.2, 0], [SPL, a.fur2, 0.75, 0.75, 0.75, 0, -4.3, 0]]));
+  return ARM_CACHE.get(a.who);
+}
+
 /* --- пешеходы на тротуарах --- */
-const PED_N = 20;
-const COATS = ["#6E7F96","#8B6F5A","#5F7A63","#93697F","#4E6577","#A08350","#77708C"];
-const PELTS = ["#C9A87C","#8FA9B8","#D2B48C","#9EB08A","#C08A6E","#B7A5C4","#E0C9A6"];
+const PED_N = 26;
+const COATS = ["#4E86C8","#E0703F","#5AA86A","#C8558E","#E8B83A","#7C63C0","#3FA8A0","#D8544A"];
 const peds = [];
 let lastPed = -9;
-function makePed(){
-  const g = new THREE.Group();
-  const body = new THREE.Mesh(CYL, new THREE.MeshLambertMaterial({color:"#6E7F96"}));
-  body.scale.set(2.4, 8.4, 2.4); body.position.y = 4.2; body.castShadow = true;
-  const head = new THREE.Mesh(SPH, new THREE.MeshLambertMaterial({color:"#C9A87C"}));
-  head.scale.setScalar(2.5); head.position.y = 10; head.castShadow = true;
-  g.add(body); g.add(head);
-  g.userData = {body:body.material, head:head.material};
-  return g;
-}
 function pedSpot(p){
   const gx = Math.max(0, Math.min(GW-1, nearI(car.x) + (Math.random()*5|0) - 2));
   const gy = Math.max(0, Math.min(GH-1, nearJ(car.y) + (Math.random()*5|0) - 2));
@@ -977,8 +1192,7 @@ function pedSpot(p){
   p.t = Math.random();
   p.sp = (0.030 + Math.random()*0.022) * (Math.random() < 0.5 ? -1 : 1);
   p.ph = Math.random()*6.283; p.scared = 0;
-  p.mesh.userData.body.color.set(COATS[Math.random()*COATS.length|0]);
-  p.mesh.userData.head.color.set(PELTS[Math.random()*PELTS.length|0]);
+  p.mesh.geometry = animalGeo(PASSENGERS[Math.random()*PASSENGERS.length|0], COATS[Math.random()*COATS.length|0]);
 }
 function pedPos(p){
   const W = BLOCK + 10, x0 = p.b.ox - 5, y0 = p.b.oy - 5;
@@ -989,14 +1203,19 @@ function pedPos(p){
   return [x0, y0 + (1-f)*W, 3];
 }
 for(let i=0;i<PED_N;i++){
-  const p = {mesh:makePed()};
-  scene.add(p.mesh); peds.push(p); pedSpot(p);
+  const m = new THREE.Mesh(SPL, animalMat);
+  m.castShadow = true;
+  const p = {mesh:m};
+  scene.add(m); peds.push(p); pedSpot(p);
 }
 function hitPed(p){
   if(clock - lastPed < 1.4) return;
   lastPed = clock;
-  S.rating = Math.max(1, S.rating*0.88 + 1.2*0.12);
-  addHeat(45, "Наезд на тротуаре", "пешеход цел, но патруль в ярости");
+  if(S.order) S.order.crashes++;
+  S.dirt = Math.min(1, S.dirt + 0.03);
+  if(calm()) toast("Осторожно, пешеход!", "по тротуару ездить нельзя");
+  else { S.rating = Math.max(1, S.rating*0.88 + 1.2*0.12);
+         addHeat(45, "Наезд на тротуаре", "пешеход цел, но патруль в ярости"); }
   sfx("crash"); shake = 3.4; p.scared = 2.2;
   save(); paintHUD(); ratingCheck();
 }
@@ -1009,23 +1228,242 @@ function updatePeds(dt){
     const d = Math.hypot(x-car.x, y-car.y);
     if(d < 36 && Math.abs(car.sp) > 34) p.scared = Math.max(p.scared, 1.1);
     if(d < 10 && Math.abs(car.sp) > 42) hitPed(p);
-    p.mesh.position.set(x, CURB, y);
-    p.mesh.rotation.y = -(pos[2]*Math.PI/2 + (p.sp < 0 ? Math.PI : 0));
     const gait = Math.sin(clock*(p.scared > 0 ? 17 : 8) + p.ph);
-    p.mesh.children[0].position.y = 4.2 + Math.abs(gait)*0.7;
-    p.mesh.children[1].position.y = 10 + Math.abs(gait)*0.7;
-    p.mesh.rotation.z = gait*0.05;
+    p.mesh.position.set(x, CURB + Math.abs(gait)*0.8, y);
+    p.mesh.rotation.y = -(pos[2]*Math.PI/2 + (p.sp < 0 ? Math.PI : 0));
+    p.mesh.rotation.x = gait*0.1;                         // вперевалочку
   }
 }
 
-let driverHead = null;
+/* --- пассажир: фигурка на остановке, посадка, высадка с маханием лапой --- */
+const figs = [];
+let waitFig = null;
+function makeFig(a){
+  const g = new THREE.Group();
+  const body = new THREE.Mesh(animalGeo(a, COATS[Math.random()*COATS.length|0], true), animalMat);
+  body.castShadow = true; g.add(body);
+  const arm = new THREE.Group();
+  arm.position.set(0.4, 8.2, 2.9);
+  const am = new THREE.Mesh(armGeo(a), animalMat); am.castShadow = true;
+  arm.add(am); g.add(arm);
+  g.scale.setScalar(1.15);
+  scene.add(g);
+  const f = {g, arm, mode:"wait", t:0, x:0, y:0, face:0, fx:0, fy:0, tx:0, ty:0};
+  figs.push(f);
+  while(figs.length > 4) dropFig(figs[0]);
+  return f;
+}
+function dropFig(f){ scene.remove(f.g); const i = figs.indexOf(f); if(i >= 0) figs.splice(i, 1); if(f === waitFig) waitFig = null; }
+function showWaiting(){
+  hideWaiting();
+  const o = S.order; if(!o) return;
+  const f = makeFig(PASSENGERS[o.kind]);
+  f.x = o.from.sx; f.y = o.from.sy; f.face = o.from.face;
+  waitFig = f;
+}
+function hideWaiting(){ if(waitFig) dropFig(waitFig); }
+function boardPax(o){
+  if(waitFig){ const f = waitFig; waitFig = null; f.mode = "board"; f.t = 0; f.fx = f.x; f.fy = f.y; }
+  taxiPax(o.kind);
+}
+function dropPax(o){
+  taxiPax(null);
+  const f = makeFig(PASSENGERS[o.kind]);
+  f.mode = "leave"; f.t = 0;
+  f.fx = car.x; f.fy = car.y; f.x = car.x; f.y = car.y;
+  f.tx = o.to.sx; f.ty = o.to.sy; f.face = o.to.face;
+}
+function updateFigs(dt){
+  for(const f of figs.slice()){
+    f.t += dt;
+    let wave = 0, y = CURB, rot = f.face, sc = 1.15;
+    if(f.mode === "wait"){
+      const near = S.order && S.order.phase === "pickup" && Math.hypot(f.x-car.x, f.y-car.y) < 280;
+      wave = near || (f.t % 6) < 1.4 ? 1 : 0;
+      y += Math.abs(Math.sin(f.t*(near ? 7 : 2)))*(near ? 1.2 : 0.3);
+    } else if(f.mode === "board"){
+      const k = Math.min(1, f.t/0.55);
+      f.x = f.fx + (car.x - f.fx)*k; f.y = f.fy + (car.y - f.fy)*k;
+      rot = -Math.atan2(car.y - f.fy, car.x - f.fx);
+      y += Math.abs(Math.sin(f.t*16))*1.2; sc = 1.15*(1 - k*0.7);
+      if(k >= 1){ dropFig(f); continue; }
+    } else if(f.mode === "leave"){
+      const k = Math.min(1, f.t/0.8);
+      f.x = f.fx + (f.tx - f.fx)*k; f.y = f.fy + (f.ty - f.fy)*k;
+      rot = -Math.atan2(f.ty - f.fy, f.tx - f.fx);
+      y += Math.abs(Math.sin(f.t*14))*1.4; sc = 1.15*(0.4 + k*0.6);
+      if(k >= 1){ f.mode = "wave"; f.t = 0; }
+    } else if(f.mode === "wave"){
+      wave = 1; y += Math.abs(Math.sin(f.t*5))*0.8;
+      if(f.t > 3.4){ f.mode = "bye"; f.t = 0; }
+    } else {
+      rot = f.face + Math.PI; y += Math.abs(Math.sin(f.t*12))*1;   // уходит от дороги
+      f.x -= Math.cos(f.face)*14*dt; f.y += Math.sin(f.face)*14*dt;
+      if(f.t > 2.2){ dropFig(f); continue; }
+    }
+    f.g.position.set(f.x, y, f.y);
+    f.g.rotation.y = rot;
+    f.g.scale.setScalar(sc);
+    f.arm.rotation.x = wave ? -2.55 + Math.sin(f.t*12)*0.42 : -0.25;
+  }
+}
+let paxHead = null;
+function freeHead(h){ h.traverse(m=>{ if(m.material) m.material.dispose(); }); }
+function taxiPax(kind){
+  if(paxHead){ taxi.remove(paxHead); freeHead(paxHead); paxHead = null; }
+  if(kind == null) return;
+  paxHead = makeHead(PASSENGERS[kind]);
+  paxHead.position.set(-5.8, 14.6, 3.1); paxHead.scale.setScalar(0.88);
+  taxi.add(paxHead);
+}
+
+let driverHead = null, driverHeadId = -1;
 function setDriverHead(){
-  if(driverHead) taxi.remove(driverHead);
-  driverHead = makeHead(CREW[S.driver]);
+  if(driverHeadId === S.driver) return;
+  if(driverHead){ taxi.remove(driverHead); freeHead(driverHead); }
+  driverHead = makeHead(CREW[S.driver]); driverHeadId = S.driver;
   driverHead.position.set(1.2, 14.8, -3.1);
   taxi.add(driverHead);
 }
-const PAX_FUR = ["#C9A87C","#8FA9B8","#D2B48C","#9EB08A","#C08A6E","#B7A5C4","#E0C9A6","#7F9AA6"];
+
+/* --- цвет и грязь такси --- */
+const MUD = new THREE.Color("#7B6446");
+let dirtShown = -1;
+function applyTaxiColor(){
+  const p = taxi.userData.paint, base = new THREE.Color(PAINTS[S.color].c);
+  p.body.color.copy(base).lerp(MUD, S.dirt*0.4);
+  p.hood.color.copy(base).multiplyScalar(0.86).lerp(MUD, S.dirt*0.45);
+  const k = Math.max(0, (S.dirt - 0.2)/0.8);
+  for(const m of taxi.userData.mud){ m.visible = k > 0.02; m.scale.set(m.userData.s*k, m.userData.s*k*0.7, 0.4); }
+  dirtShown = S.dirt;
+}
+
+/* --- станции: навес над полосой, вывеска на крыше, свой реквизит --- */
+function signTexture(text, col){
+  const c = document.createElement("canvas"); c.width = 512; c.height = 128;
+  const g = c.getContext("2d");
+  g.fillStyle = "#FFFFFF"; g.fillRect(0, 0, 512, 128);
+  g.fillStyle = col; g.fillRect(8, 8, 496, 112);
+  g.fillStyle = "#FFFFFF"; g.font = "900 64px system-ui, -apple-system, 'Segoe UI', sans-serif";
+  g.textAlign = "center"; g.textBaseline = "middle"; g.fillText(text, 256, 68);
+  const t = new THREE.CanvasTexture(c); t.anisotropy = 4;
+  return t;
+}
+const brushes = [];
+for(const st of STATIONS){
+  const b = blocks[st.gy][st.gx], cx = st.x, zE = b.oy;
+  const col = new THREE.MeshLambertMaterial({color:st.col}), white = new THREE.MeshLambertMaterial({color:"#FBFBF6"});
+  for(const dx of [-40, 40]){ const c = part(CYL, white, 2.2, 32, 2.2, cx+dx, CURB+16, zE+6); c.castShadow = true; scene.add(c); }
+  const roof = part(BOXG, col, 104, 4.5, 50, cx, 34, zE-12); roof.castShadow = true; scene.add(roof);
+  scene.add(part(BOXG, white, 105, 1.8, 51, cx, 31.4, zE-12));
+  const board = new THREE.Mesh(new THREE.PlaneGeometry(76, 19), new THREE.MeshBasicMaterial({map:signTexture(st.sign, st.col)}));
+  board.position.set(cx, CURB + 30 + 11, b.oy + 44 - 0.4); board.rotation.y = Math.PI; scene.add(board);
+  scene.add(part(BOXG, darkMat, 78, 21, 1.2, cx, CURB + 30 + 11, b.oy + 44 + 0.4));
+  const pad = new THREE.Mesh(new THREE.PlaneGeometry(58, 30),
+    new THREE.MeshBasicMaterial({color:st.col, transparent:true, opacity:0.32, depthWrite:false}));
+  pad.rotation.x = -Math.PI/2; pad.position.set(st.x, 0.45, st.y); scene.add(pad);
+  if(st.kind === "fuel") for(const dx of [-20, 20]){
+    scene.add(part(BOXG, white, 7, 13, 5, cx+dx, CURB+6.5, zE+8));
+    scene.add(part(BOXG, col, 7.4, 3, 5.4, cx+dx, CURB+13.5, zE+8));
+    scene.add(part(BOXG, darkMat, 4, 3, 0.6, cx+dx, CURB+8.5, zE+5.4));
+  }
+  if(st.kind === "wash") for(const dx of [-24, 24]){
+    const br = part(CYL, new THREE.MeshLambertMaterial({color:dx < 0 ? "#3C8FD8" : "#F2D43C"}), 5, 24, 5, cx+dx, CURB+12, zE+4);
+    scene.add(br); brushes.push(br);
+  }
+  if(st.kind === "paint") PAINTS.slice(0, 5).forEach((p, i)=>{
+    scene.add(part(CYL, new THREE.MeshLambertMaterial({color:p.c}), 3, 6, 3, cx - 28 + i*14, CURB+3, zE+9));
+  });
+}
+const bubbleMesh = new THREE.InstancedMesh(SPL, new THREE.MeshLambertMaterial({color:"#FFFFFF", transparent:true, opacity:0.8}), 28);
+bubbleMesh.count = 0; bubbleMesh.frustumCulled = false; scene.add(bubbleMesh);
+
+/* --- бензин, грязь, обслуживание --- */
+const CRAWL = 40;
+let svc = null, svcLock = null, washing = false, fuelWarned = false, emptyWarned = false, carTick = 0;
+function nearStation(kind){
+  let best = null, bd = 1e9;
+  for(const st of STATIONS) if(!kind || st.kind === kind){
+    const d = Math.hypot(st.x-car.x, st.y-car.y);
+    if(d < bd){ bd = d; best = st; }
+  }
+  return best;
+}
+const navTarget = ()=> nearStation("fuel");
+function svcDone(msg, sub, task){
+  toast(msg, sub, "good"); sfx("coin");
+  svcLock = svc.st; svc = null;
+  if(task) taskProgress(task, 1);
+  save(); paintHUD();
+}
+function updateCar(dt){
+  const moved = Math.abs(car.sp)*dt;
+  S.fuel = Math.max(0, S.fuel - moved/9000);
+  S.dirt = Math.min(1, S.dirt + moved/22000);
+  if(S.fuel < 0.2 && S.fuel > 0 && !fuelWarned){ fuelWarned = true; toast("Бензин кончается", "заправка — значок «З» на карте"); }
+  if(S.fuel <= 0 && !emptyWarned){ emptyWarned = true; toast("Бак пуст!", "едем медленно, стрелка ведёт на заправку"); }
+  if(S.fuel > 0.3){ fuelWarned = false; emptyWarned = false; }
+  if(Math.abs(S.dirt - dirtShown) > 0.02) applyTaxiColor();
+
+  const st = nearStation(), d = Math.hypot(st.x-car.x, st.y-car.y);
+  if(svcLock && Math.hypot(svcLock.x-car.x, svcLock.y-car.y) > 70) svcLock = null;
+  const inZone = d < 30 && Math.abs(car.sp) < 30 && svcLock !== st;
+  if(svc && (!inZone || svc.st !== st)) svc = null;
+  washing = false;
+  let chip = null;
+  if(inZone){
+    if(st.kind === "fuel"){
+      if(S.fuel < 0.995){
+        if(!svc){ svc = {st}; sfx("ui"); }
+        const add = Math.min(1 - S.fuel, 0.5*dt), fee = add*40;
+        S.fuel += add; if(S.money >= fee) S.money -= fee;
+        chip = ["Заправляемся…", S.fuel];
+        if(S.fuel >= 0.995){ S.fuel = 1; svcDone("Полный бак!", "можно ехать дальше", "fuel"); }
+      } else chip = ["Бак и так полный", 1];
+    } else if(st.kind === "wash"){
+      if(S.dirt > 0.03){
+        if(!svc){ svc = {st}; const fee = S.money >= 15 ? 15 : 0; S.money -= fee; toast("Мойка", fee ? "15 ж" : "сегодня бесплатно"); }
+        S.dirt = Math.max(0, S.dirt - 0.6*dt); washing = true;
+        chip = ["Моемся…", 1 - S.dirt];
+        if(S.dirt <= 0.03){ S.dirt = 0; applyTaxiColor(); svcDone("Такси блестит!", "чаевые снова полные", "wash"); }
+      } else chip = ["Такси и так чистое", 1];
+    } else if(st.kind === "paint"){
+      svcLock = st; car.sp = 0;
+      paintSheet();
+    }
+  } else if(d < 130 && svcLock !== st){
+    chip = [st.kind === "paint" ? "Покраска — встань на площадку" : st.name + " — встань на площадку", 0];
+  }
+  const sc = el("svcChip");
+  sc.hidden = !chip;
+  if(chip){
+    el("svcText").textContent = chip[0];
+    el("svcBar").style.width = (chip[1]*100).toFixed(0) + "%";
+    sc.style.setProperty("--svc", st.col);
+  }
+
+  carTick += dt;
+  if(carTick > 5){
+    carTick = 0;
+    if(ensureDaily()) toast("Новый день — новые задания", "кнопка «Задания»");
+    paintBadge(); save();
+  }
+}
+let bubT = 0;
+function updateStationFx(dt){
+  for(const br of brushes) if(washing) br.rotation.y += dt*14;
+  if(!washing && !bubbleMesh.count) return;
+  bubT += dt;
+  const n = bubbleMesh.count = washing ? 28 : 0;
+  for(let i=0;i<n;i++){
+    const ph = (bubT*0.7 + i/n) % 1, an = i*2.4;
+    _mp.set(car.x + Math.cos(an)*(9 + ph*8), 4 + ph*26, car.y + Math.sin(an)*(9 + ph*8));
+    const s = 1.2 + (i%3)*0.7;
+    _mm.compose(_mp, _mq.identity(), _ms.set(s, s, s));
+    bubbleMesh.setMatrixAt(i, _mm);
+  }
+  bubbleMesh.instanceMatrix.needsUpdate = true;
+}
 
 /* --- точка заказа: столб света и кольцо --- */
 const beamMat = new THREE.MeshBasicMaterial({color:"#2E8C56", transparent:true, opacity:0.26, depthWrite:false});
@@ -1124,7 +1562,6 @@ function syncScene(dt){
   taxi.position.set(car.x, 0, car.y);
   taxi.rotation.y = -car.a;
   taxi.rotation.z = car.roll;
-  taxi.userData.pax.visible = !!(S.order && S.order.phase === "ride");
   if(driverHead) driverHead.rotation.y = -(car.steer||0)*0.4;
 
   for(const v of traffic){ v.mesh.position.set(v.x, 0, v.y); v.mesh.rotation.y = -Math.atan2(v.dy, v.dx); }
@@ -1138,10 +1575,12 @@ function syncScene(dt){
   updateSky();
   updateCoins(dt);
   updateSkids(dt);
+  updateFigs(dt);
+  updateStationFx(dt);
 
-  const tg = target();
+  const empty = S.fuel <= 0, tg = empty ? navTarget() : target();
   if(tg && S.started){
-    const pickup = S.order.phase === "pickup", col = pickup ? "#2E8C56" : "#D24437";
+    const col = empty ? "#E8892B" : S.order.phase === "pickup" ? "#2E8C56" : "#D24437";
     markerGroup.visible = true;
     markerGroup.position.set(tg.x, 0, tg.y);
     beamMat.color.set(col); ringMat.color.set(col); arrowMat.color.set(col);
@@ -1168,8 +1607,14 @@ function syncScene(dt){
     tmp.set(hx, 15.4, hz);
     camAim.lerp(tmp, k);
   } else {
-    const back = 62 + Math.abs(car.sp)*0.22, high = 30 + Math.abs(car.sp)*0.06;
-    if(viewMode === 0) tmp.set(car.x - ca*back, high, car.y - sa*back);
+    let back = 62 + Math.abs(car.sp)*0.22, high = 30 + Math.abs(car.sp)*0.06;
+    if(viewMode === 0){
+      // камера не заходит в кварталы: укорачиваем плечо и поднимаемся выше
+      for(let d = 8; d <= back; d += 6){
+        if(camBlocked(car.x - ca*d, car.y - sa*d)){ const cut = Math.max(20, d - 8); high += (back - cut)*0.55; back = cut; break; }
+      }
+      tmp.set(car.x - ca*back, high, car.y - sa*back);
+    }
     else               tmp.set(car.x - ca*40, 210, car.y - sa*40);
     camPos.lerp(tmp, k);
     tmp.set(car.x + ca*36, viewMode === 0 ? 9 : 0, car.y + sa*36);
@@ -1210,6 +1655,11 @@ function drawMini(){
   }
   mx.fillStyle = "#6F7A80";
   for(const v of traffic) mx.fillRect(v.x*sx-1.5, v.y*sy-1.5, 3, 3);
+  mx.font = "bold 9px system-ui, sans-serif"; mx.textAlign = "center"; mx.textBaseline = "middle";
+  for(const st of STATIONS){
+    mx.fillStyle = st.col; mx.beginPath(); mx.arc(st.x*sx, st.y*sy, 7, 0, 6.283); mx.fill();
+    mx.fillStyle = "#fff"; mx.fillText(st.letter, st.x*sx, st.y*sy + 0.5);
+  }
   const tg = target();
   if(tg && S.started){
     mx.fillStyle = S.order.phase==="pickup" ? "#2E8C56" : "#D24437";
@@ -1219,7 +1669,7 @@ function drawMini(){
     mx.fillStyle = Math.floor(clock*6)%2 ? "#2F6FD0" : "#D24437";
     mx.beginPath(); mx.arc(c.x*sx, c.y*sy, 4, 0, 6.283); mx.fill();
   }
-  mx.fillStyle = "#F2A93C"; mx.strokeStyle = "#7A4A0E"; mx.lineWidth = 1.5;
+  mx.fillStyle = PAINTS[S.color].c; mx.strokeStyle = "#2B343A"; mx.lineWidth = 1.5;
   mx.beginPath(); mx.arc(car.x*sx, car.y*sy, 4, 0, 6.283); mx.fill(); mx.stroke();
 }
 
@@ -1263,6 +1713,7 @@ function update(dt){
   else if(keys.brake) car.sp -= (car.sp > 3 ? P.acc*1.9 : P.acc*1.1)*dt;
   car.sp *= (1 - 1.05*dt);
   car.sp = Math.max(-P.max*0.45, Math.min(P.max, car.sp));
+  if(S.fuel <= 0) car.sp = Math.max(-CRAWL, Math.min(CRAWL, car.sp));   // пустой бак: еле ползём
 
   const grip = Math.min(1, Math.abs(car.sp)/34), dir = car.sp < 0 ? -1 : 1;
   let steer = 0;
@@ -1308,7 +1759,11 @@ function update(dt){
       const into = (Math.cos(car.a)*ddx + Math.sin(car.a)*ddy)/d;
       if((car.sp > 0 && into > 0.3) || (car.sp < 0 && into < -0.3)){
         const hard = Math.abs(car.sp) > 42;
-        if(hard && clock - lastHit > 1.1 && S.order) S.order.crashes++;
+        if(hard && clock - lastHit > 1.1){
+          if(S.order) S.order.crashes++;
+          S.dirt = Math.min(1, S.dirt + 0.03);
+          if(calm()){ lastHit = clock; toast("Бум! Осторожнее", "авария — минус звезда за поездку"); }
+        }
         car.sp *= P.armor ? 0.75 : (hard ? -0.2 : 0.4);
         if(hard){ addHeat(30, "ДТП с попутной машиной", "патруль это заметил"); sfx("crash"); shake = 3.6; }
       }
@@ -1319,27 +1774,34 @@ function update(dt){
   const ii = nearI(car.x), jj = nearJ(car.y), key = ii+":"+jj;
   if(Math.abs(car.x-roadX(ii)) < ROAD/2 && Math.abs(car.y-roadY(jj)) < ROAD/2){
     if(key !== lastCross && ax !== greenAxis() && !amberNow() && Math.abs(car.sp) > 55){
-      lastCross = key; addHeat(18, "Проезд на красный", "перекрёсток " + key.replace(":", "×"));
+      lastCross = key;
+      if(S.order) S.order.reds++;
+      if(calm()){ if(clock - lastHit > 1.1){ lastHit = clock; toast("Красный свет!", "в следующий раз подожди зелёный"); } }
+      else addHeat(18, "Проезд на красный", "перекрёсток " + key.replace(":", "×"));
     } else lastCross = key;
   }
 
   if(clock - lastViol > 3) heat = Math.max(0, heat - 5.5*dt);
   if(cops.length && heat <= 14){ clearCops(); toast("Оторвались", "патруль потерял такси из виду"); }
 
+  updateCar(dt);
   if(!S.order) return;
   const o = S.order, tg = target();
-  o.patience = Math.max(0, o.patience - dt);
+  if(S.fuel > 0) o.patience = Math.max(0, o.patience - dt);   // пока бак пуст, пассажир терпеливо ждёт
   if(o.patience <= 0){
-    if(o.phase === "pickup"){ failOrder(false); return; }
-    o.late = (o.late || 0) + dt;
-    if(o.late > 28){ failOrder(true); return; }
+    if(o.phase === "pickup"){
+      if(calm()) o.lateP = true; else { failOrder(false); return; }
+    } else {
+      o.late = (o.late || 0) + dt;
+      if(!calm() && o.late > 28){ failOrder(true); return; }
+    }
   }
   if(o.phase === "ride") o.ridden += Math.abs(car.sp)*dt;
 
   if(Math.hypot(car.x-tg.x, car.y-tg.y) < 32 && Math.abs(car.sp) < 26){
     if(o.phase === "pickup"){
       o.phase = "ride"; setPatience();
-      taxi.userData.pax.userData.fur.color.set(o.fur);
+      boardPax(o);
       toast("Пассажир в салоне", `${o.who} · едем на ${o.to.street}`); paintOrder();
     } else finish();
   }
@@ -1355,20 +1817,38 @@ function finish(){
   const o = S.order, P = stats();
   const meters = Math.max(o.ridden, Math.hypot(o.from.x-o.to.x, o.from.y-o.to.y)*0.9) * M_PER_PX;
   const fare = Math.round((BOARD + meters*PER_M) * P.fare);
-  const left = o.patience / o.patMax;
-  const tip = Math.round(fare * 0.4 * left * P.tips);
+  const left = (o.patience / o.patMax) * (o.lateP ? 0.5 : 1);
+  const clean = 1 - 0.6*S.dirt;                                  // грязная машина — меньше чаевых
+  const tip = Math.round(fare * 0.4 * left * P.tips * clean);
   const total = fare + tip;
 
-  const score = 5 - Math.min(2, o.crashes*0.6) - (left <= 0 ? 1.2 : 0);
+  const late = o.lateP || o.patience <= 0;
+  const stars = Math.max(1, 3 - (late ? 1 : 0) - (o.crashes ? 1 : 0) - (o.reds ? 1 : 0));
+  const score = 5 - Math.min(2, o.crashes*0.6) - (late ? 1.2 : 0);
   S.rating = Math.max(1, Math.min(5, S.rating*0.85 + score*0.15));
-  S.money += total; S.orders++; S.shiftOrders++; S.shiftMoney += total;
+  S.money += total; S.orders++; S.shiftOrders++; S.shiftMoney += total; S.stars += stars;
   coins(); sfx("coin");
-  toast(`+${total.toLocaleString("ru-RU")} ж`, `${Math.round(meters)} м · счётчик ${fare} ж · чаевые ${tip} ж`);
+  const why = [late ? "опоздали" : "", o.crashes ? "авария" : "", o.reds ? "красный свет" : ""].filter(Boolean).join(", ");
+  toast(`+${total.toLocaleString("ru-RU")} ж`, `счётчик ${fare} ж · чаевые ${tip} ж${S.dirt > 0.4 ? " · грязное такси" : ""}`);
+  starPop(stars, why);
+  dropPax(o);
+
+  const fresh = !S.album[o.who];
+  if(fresh){
+    S.album[o.who] = true;
+    setTimeout(()=>{ toast(`${avatar(PASSENGERS[o.kind], 34)}<span>Новая наклейка: ${o.who}</span>`,
+      `альбом: ${Object.keys(S.album).length} из ${PASSENGERS.length}`, "sticker"); sfx("level"); }, 900);
+  }
+  taskProgress("rides", 1);
+  taskProgress("stars", stars);
+  if(stars === 3) taskProgress("perfect", 1);
+  if(!o.reds) taskProgress("green", 1);
+  taskKind(o.who);
   save();
 
   if(S.orders % 10 === 0 && S.unlocked < CREW.length){
     S.unlocked++; S.order = null; paintHUD(); save(); sfx("level");
-    setTimeout(()=> unlockSheet(CREW[S.unlocked-1]), 450);
+    setTimeout(()=> unlockSheet(CREW[S.unlocked-1]), 1600);
     return;
   }
   newOrder(); paintHUD();
@@ -1382,17 +1862,18 @@ function failOrder(mid){
   if(mid){
     const paid = Math.round(BOARD * stats().fare);
     S.money += paid;
-    toast(`${o.who} вышел на полпути`, `оплачена только посадка · ${paid} ж`);
+    toast(`Пассажир (${o.who}) вышел на полпути`, `оплачена только посадка · ${paid} ж`);
   } else {
-    toast(`${o.who} ушёл пешком`, `заказ сорван · рейтинг ${S.rating.toFixed(2)}`);
+    toast(`Пассажир (${o.who}) не дождался`, `заказ сорван · рейтинг ${S.rating.toFixed(2)}`);
   }
   sfx("fail");
+  hideWaiting(); taxiPax(null);
   S.order = null; save(); paintHUD(); paintOrder();
   if(ratingCheck()) return;
   newOrder();
 }
 function ratingCheck(){
-  if(S.started && S.rating < 2){
+  if(S.started && !calm() && S.rating < 2){
     endShift("Диспетчер снял с линии", `Рейтинг упал до ${S.rating.toFixed(2)}. В парке такому за руль больше не дают — до завтра.`);
     return true;
   }
@@ -1400,7 +1881,7 @@ function ratingCheck(){
 }
 function endShift(title, why){
   S.started = false; S.paused = true; S.order = null;
-  heat = 0; clearCops(); car.sp = 0;
+  heat = 0; clearCops(); car.sp = 0; hideWaiting(); taxiPax(null);
   const money = Math.round(S.shiftMoney), rec = money > S.record.money;
   if(rec) S.record = {money, orders:S.shiftOrders};
   save(); paintOrder(); paintHUD();
@@ -1426,60 +1907,143 @@ function newShift(){
   audioBoot(); closeSheet(); newOrder(); paintHUD(); save();
 }
 
+/* ---------- ежедневные задания ---------- */
+const TASKS = {
+  rides:   {n:[4,6], text:n=>`Отвези ${n} пассажиров`, reward:80},
+  stars:   {n:[9,12], text:n=>`Собери ${n} звёзд`, reward:80},
+  wash:    {n:[1,1], text:()=>"Помой такси на мойке", reward:40},
+  fuel:    {n:[1,1], text:()=>"Заправь такси", reward:40},
+  perfect: {n:[2,3], text:n=>`${n} поездки на три звезды`, reward:90},
+  kinds:   {n:[3,4], text:n=>`Прокати ${n} разных зверей`, reward:70},
+  paint:   {n:[1,1], text:()=>"Перекрась такси", reward:50},
+  green:   {n:[3,4], text:n=>`${n} поездки без красного света`, reward:70}
+};
+function today(){
+  const d = new Date();
+  return d.getFullYear() + "-" + String(d.getMonth()+1).padStart(2,"0") + "-" + String(d.getDate()).padStart(2,"0");
+}
+function dailyValid(d){
+  return d && d.date === today() && Array.isArray(d.list) && d.list.length === 3 &&
+    d.list.every(t => t && TASKS[t.id] && typeof t.n === "number" && typeof t.p === "number") && Array.isArray(d.kinds);
+}
+function ensureDaily(){
+  if(dailyValid(S.daily)) return false;
+  const day = today(), r = mulberry32(+day.replace(/-/g, ""));
+  const pool = Object.keys(TASKS).filter(k => k !== "rides");
+  const pick = ["rides"];
+  while(pick.length < 3){ const k = pool[Math.floor(r()*pool.length)]; if(!pick.includes(k)) pick.push(k); }
+  S.daily = {date:day, kinds:[], list: pick.map(id=>{
+    const [a,b] = TASKS[id].n;
+    return {id, n: a + Math.floor(r()*(b-a+1)), p:0, done:false};
+  })};
+  save();
+  return true;
+}
+function taskProgress(id, amount){
+  ensureDaily();
+  for(const t of S.daily.list){
+    if(t.id !== id || t.done) continue;
+    t.p = Math.min(t.n, t.p + amount);
+    if(t.p >= t.n){
+      t.done = true;                                   // флаг сохраняется — награду нельзя получить дважды
+      const rw = TASKS[id].reward;
+      S.money += rw;
+      setTimeout(()=>{ toast(`Задание выполнено: +${rw} ж`, TASKS[id].text(t.n), "good"); sfx("level"); }, 1400);
+    }
+  }
+  save(); paintBadge();
+}
+function taskKind(who){
+  ensureDaily();
+  if(!S.daily.kinds.includes(who)){ S.daily.kinds.push(who); taskProgress("kinds", 1); }
+}
+function paintBadge(){
+  if(!S.daily) return;
+  const d = S.daily.list.filter(t => t.done).length, b = el("taskBadge");
+  b.textContent = d + "/3"; b.classList.toggle("done", d === 3);
+}
+
 /* ---------- HUD ---------- */
 const el = id => document.getElementById(id);
 const veil = el("veil"), sheet = el("sheet");
+const fmt = n => Math.round(n).toLocaleString("ru-RU");
 function paintHUD(){
   const a = CREW[S.driver];
   el("chipAv").innerHTML = avatar(a, 54);
   el("chipName").textContent = `${a.name} · ${a.kind}`;
   el("chipPerk").textContent = a.perk;
-  el("moneyText").textContent = Math.round(S.money).toLocaleString("ru-RU");
+  el("moneyText").textContent = fmt(S.money);
+  el("starsText").textContent = S.stars;
   el("ratingText").textContent = S.rating.toFixed(2);
   el("ordersText").textContent = S.orders;
   el("failsText").textContent = S.fails;
+  el("failsBox").hidden = calm();
   const inCycle = S.orders % 10, full = S.unlocked >= CREW.length;
   el("nextUpBar").style.width = (full ? 100 : inCycle*10) + "%";
   el("nextUpN").textContent = full ? "весь парк открыт" : `через ${10-inCycle}`;
   setDriverHead();
+  paintBadge();
 }
 function paintOrder(){
   const o = S.order;
-  if(!o){ el("goalText").textContent = "Смена не начата"; el("addrText").textContent = "Хвостоград, парк такси"; el("distText").textContent = "—"; return; }
+  if(!o){ el("goalText").textContent = S.started ? "Ищем пассажира…" : "Смена не начата"; el("addrText").textContent = "Хвостоград, парк такси"; el("distText").textContent = "—"; return; }
   const p = o.phase === "pickup", t = p ? o.from : o.to;
   el("goalText").innerHTML = p
-    ? `Забрать пассажира — <span style="color:#2E8C56">${o.who}</span>`
-    : `Отвезти — <span style="color:#D24437">${o.who}</span>`;
+    ? `Забрать: <span style="color:#2E8C56">${o.who}</span>`
+    : `Отвезти: <span style="color:#D24437">${o.who}</span>`;
   el("addrText").innerHTML = `<b>${t.street}, ${t.house}</b>`;
 }
+
 function paintLive(){
   el("speedText").textContent = Math.round(Math.abs(car.sp) * M_PER_PX * 3.6);
   el("clockText").textContent = cityTime();
+  el("fuelBar").style.width = (S.fuel*100).toFixed(1) + "%";
+  el("cleanBar").style.width = ((1-S.dirt)*100).toFixed(1) + "%";
+  el("fuelG").classList.toggle("warn", S.fuel < 0.2);
+  el("dirtG").classList.toggle("warn", S.dirt > 0.6);
   const chip = el("heatChip");
-  chip.hidden = heat < 1;
+  chip.hidden = calm() || heat < 1;
   if(!chip.hidden){
     el("heatBar").style.width = Math.min(100, heat/1.2) + "%";
     el("heatText").textContent = cops.length ? (cops.length > 1 ? "Погоня: два экипажа" : "Патруль на хвосте") : "Внимание патруля";
   }
   const o = S.order;
   if(!o){ el("fareText").textContent = "0"; el("distText").textContent = "—"; return; }
-  const tg = target(), dm = Math.hypot(car.x-tg.x, car.y-tg.y) * M_PER_PX;
-  el("distText").textContent = dm > 999 ? (dm/1000).toFixed(2).replace(".",",") + " км" : Math.round(dm) + " м";
+  const tg = S.fuel <= 0 ? navTarget() : target(), dm = Math.hypot(car.x-tg.x, car.y-tg.y) * M_PER_PX;
+  el("distText").textContent = (S.fuel <= 0 ? "до заправки " : "") + (dm > 999 ? (dm/1000).toFixed(2).replace(".",",") + " км" : Math.round(dm) + " м");
   el("fareText").textContent = o.phase === "ride" ? Math.round((BOARD + o.ridden*M_PER_PX*PER_M) * stats().fare) : 0;
   const bar = el("patBar"), f = o.patience/o.patMax;
   bar.firstElementChild.style.width = (f*100).toFixed(1) + "%";
   bar.classList.toggle("low", f < 0.3);
+  if(S.fuel <= 0) el("goalText").innerHTML = `<span style="color:#E4574B">Бак пуст!</span> Ползём на заправку`;
 }
-function toast(t, s){
+function toast(t, s, cls){
   const d = document.createElement("div");
-  d.className = "tst"; d.innerHTML = t + (s ? `<small>${s}</small>` : "");
-  el("toast").appendChild(d);
+  d.className = "tst" + (cls ? " " + cls : "");
+  const sub = s ? `<small>${s}</small>` : "";
+  d.innerHTML = cls === "sticker" ? t.replace(/<\/span>$/, sub + "</span>") : t + sub;
+  const box = el("toast");
+  box.appendChild(d);
+  while(box.children.length > 3) box.firstElementChild.remove();
   setTimeout(()=>{ d.style.transition = "opacity .4s"; d.style.opacity = 0; setTimeout(()=>d.remove(), 400); }, 2600);
+}
+let starT = 0;
+function starPop(n, why){
+  const box = el("starPop");
+  box.innerHTML = `<div class="st">${"★".repeat(n)}<i>${"★".repeat(3-n)}</i></div>` +
+    (n < 3 && why ? `<div class="why">${why}</div>` : n === 3 ? `<div class="why">Идеальная поездка!</div>` : "");
+  clearTimeout(starT);
+  starT = setTimeout(()=>{ box.innerHTML = ""; }, 1900);
+  [0,1,2].slice(0, n).forEach(i => blip(988 + i*260, 0.22, "triangle", 0.18, 0.1 + i*0.12));
 }
 
 /* ---------- панели ---------- */
-function openSheet(html){ sheet.innerHTML = html; veil.hidden = false; S.paused = true; clearKeys(); }
-function closeSheet(){ veil.hidden = true; clearKeys(); if(S.started) S.paused = false; }
+let sheetOnClose = null;
+function openSheet(html, onClose){ sheet.innerHTML = html; veil.hidden = false; S.paused = true; clearKeys(); sheetOnClose = onClose || null; }
+function closeSheet(){
+  veil.hidden = true; clearKeys(); if(S.started) S.paused = false;
+  const f = sheetOnClose; sheetOnClose = null; if(f) f();
+}
 veil.addEventListener("click", e=>{ if(e.target === veil && S.started) closeSheet(); });
 function bindClose(){ sheet.querySelectorAll("[data-close]").forEach(b=> b.onclick = closeSheet); }
 
@@ -1493,13 +2057,13 @@ function garage(){
       <div class="ef">${l ? u.ef(l) : "не улучшено"}${max ? "" : ` → ${u.ef(l+1)}`}</div>
     </div>`;
   }).join("");
-  openSheet(`<h2>Гараж</h2><div class="sub">Улучшения общие для всего парка — их получает любой водитель, кто сядет за руль.</div>
+  openSheet(`<h2>Гараж</h2><div class="sub">Улучшения достаются всем водителям парка.</div>
     <div class="upg">${rows}</div>
-    <div class="foot"><span class="label">в кассе ${Math.round(S.money).toLocaleString("ru-RU")} ж</span>
+    <div class="foot"><span class="label">в кассе ${fmt(S.money)} ж</span>
     <button class="btn primary" data-close>На линию</button></div>`);
   sheet.querySelectorAll("[data-up]").forEach(b=> b.onclick = ()=>{
     const u = UPGRADES.find(x=>x.id===b.dataset.up), l = S.up[u.id], c = cost(u,l);
-    if(S.money >= c && l < MAXLVL){ S.money -= c; S.up[u.id]++; save(); paintHUD(); garage(); toast(`${u.name} · уровень ${S.up[u.id]}`); }
+    if(S.money >= c && l < MAXLVL){ S.money -= c; S.up[u.id]++; save(); paintHUD(); garage(); toast(`${u.name} · уровень ${S.up[u.id]}`); sfx("ui"); }
   });
   bindClose();
 }
@@ -1508,11 +2072,11 @@ function crew(){
     const open = i < S.unlocked, cur = i === S.driver;
     return `<div class="c ${cur?"on":""} ${open?"":"lock"}">${avatar(a, 56)}
       <div class="nm">${open ? a.name : "???"}</div>
-      <div class="${open?"pk":"lk"}">${open ? a.perk : `откроется на ${a.at}-м заказе`}</div>
+      <div class="${open?"pk":"lk"}">${open ? a.perk : `придёт на ${a.at}-м заказе`}</div>
       ${open ? `<button class="btn" data-crew="${i}" ${cur?"disabled":""}>${cur?"за рулём":"за руль"}</button>` : ""}
     </div>`;
   }).join("");
-  openSheet(`<h2>Парк водителей</h2><div class="sub">Каждые 10 заказов в парк приходит новое животное. Перк работает, пока оно за рулём.</div>
+  openSheet(`<h2>Парк водителей</h2><div class="sub">Каждые 10 заказов приходит новый водитель со своим умением.</div>
     <div class="crew">${cards}</div>
     <div class="foot"><span class="label">открыто ${S.unlocked} из ${CREW.length}</span><button class="btn primary" data-close>На линию</button></div>`);
   sheet.querySelectorAll("[data-crew]").forEach(b=> b.onclick = ()=>{ S.driver = +b.dataset.crew; save(); paintHUD(); crew(); });
@@ -1521,54 +2085,127 @@ function crew(){
 function unlockSheet(a){
   openSheet(`<div class="hero">${avatar(a,88)}<div><h2>${a.name} выходит на смену</h2>
     <div class="sub" style="margin-bottom:0">${a.kind[0].toUpperCase()+a.kind.slice(1)}. ${a.perk}</div></div></div>
-    <div class="foot"><button class="btn" data-stay>Остаться за рулём</button><button class="btn primary" data-take>Передать руль</button></div>`);
-  sheet.querySelector("[data-take]").onclick = ()=>{ S.driver = CREW.indexOf(a); save(); paintHUD(); closeSheet(); newOrder(); };
-  sheet.querySelector("[data-stay]").onclick = ()=>{ closeSheet(); newOrder(); };
+    <div class="foot"><button class="btn" data-stay>Остаться за рулём</button><button class="btn primary" data-take>Передать руль</button></div>`,
+    ()=>{ if(S.started && !S.order) newOrder(); });
+  sheet.querySelector("[data-take]").onclick = ()=>{ S.driver = CREW.indexOf(a); save(); paintHUD(); closeSheet(); };
+  sheet.querySelector("[data-stay]").onclick = closeSheet;
   paintHUD();
 }
-function pauseMenu(){
-  openSheet(`<h2>Пауза</h2><div class="sub">Счётчик остановлен, пассажир не нервничает.</div>
-    <div class="keys"><kbd>A</kbd> <kbd>D</kbd> или ← → — руль · <kbd>W</kbd> ↑ — газ · <kbd>S</kbd> ↓ — тормоз и задний ход<br>
-    <kbd>C</kbd> или кнопка «Вид» — камера сзади → сверху → на водителя. <kbd>M</kbd> — звук. <kbd>Esc</kbd> — пауза.<br>
-    Зелёный столб — посадка, красный — высадка. ДТП, красный свет и наезд на тротуаре вызывают патруль.<br>
-    Терпение кончилось у стоящего пассажира — заказ сорван; рейтинг ниже 2,00 закрывает смену.</div>
-    <div class="foot" style="flex-wrap:wrap">
-      <button class="btn" data-reset>Сбросить всё</button>
-      <button class="btn" data-hand>Сдать смену</button>
-      <button class="btn primary" data-close>Продолжить</button></div>`);
-  sheet.querySelector("[data-hand]").onclick = ()=>
-    endShift("Смена сдана", `За смену ${S.shiftOrders} заказов. Выручка в кассе, гараж открыт.`);
-  sheet.querySelector("[data-reset]").onclick = ()=>{
-    if(!confirm("Сбросить заработок, прокачку и парк водителей?")) return;
-    S.money=0; S.orders=0; S.rating=5; S.driver=0; S.unlocked=1; S.up={motor:0,boost:0,tyres:0,meterUp:0,charm:0};
-    S.fails=0; S.record={money:0,orders:0}; S.shiftMoney=0; S.shiftOrders=0; S.shiftFails=0;
-    heat=0; clearCops();
-    save(); paintHUD(); newOrder(); closeSheet();
-  };
+function albumSheet(){
+  const n = Object.keys(S.album).length;
+  const cards = PASSENGERS.map(p=>{
+    const on = !!S.album[p.who];
+    return `<div class="s ${on ? "on" : "off"}">${avatar(p, 60)}<b>${on ? p.who : "?"}</b></div>`;
+  }).join("");
+  openSheet(`<h2>Альбом наклеек</h2><div class="sub">Первая поездка с новым зверем приносит наклейку. Собрано ${n} из ${PASSENGERS.length}.</div>
+    <div class="album">${cards}</div>
+    <div class="foot"><span class="label">★ всего звёзд: ${S.stars}</span><button class="btn primary" data-close>На линию</button></div>`);
   bindClose();
 }
-el("btnGarage").onclick = ()=>{ if(S.started) garage(); };
-el("btnCrew").onclick = ()=>{ if(S.started) crew(); };
+function tasksSheet(){
+  ensureDaily();
+  const rows = S.daily.list.map(t=>{
+    const T = TASKS[t.id];
+    return `<div class="task ${t.done ? "done" : ""}"><div class="nm">${t.done ? "✓ " : ""}${T.text(t.n)}</div>
+      <div class="rw">${t.done ? "получено" : "+" + T.reward + " ж"}</div>
+      <div class="bar"><i style="width:${(t.p/t.n*100).toFixed(0)}%"></i></div></div>`;
+  }).join("");
+  openSheet(`<h2>Задания на сегодня</h2><div class="sub">Завтра будут новые. Награда приходит сразу.</div>
+    <div class="tasks">${rows}</div>
+    <div class="foot"><span class="label">${S.daily.list.filter(t=>t.done).length} из 3 выполнено</span><button class="btn primary" data-close>На линию</button></div>`);
+  bindClose();
+}
+function paintSheet(){
+  const sw = PAINTS.map((p,i)=>{
+    const cur = i === S.color, can = S.money >= PAINT_COST;
+    return `<button class="sw ${cur ? "on" : ""}" data-paint="${i}" ${cur || !can ? "disabled" : ""} aria-label="${p.name}">
+      <i style="background:${p.c}"></i>${cur ? "сейчас" : p.name}</button>`;
+  }).join("");
+  openSheet(`<h2>Покраска</h2><div class="sub">Выбери любимый цвет. Покраска стоит ${PAINT_COST} ж, цвет останется навсегда.</div>
+    <div class="swatches">${sw}</div>
+    <div class="foot"><span class="label">в кассе ${fmt(S.money)} ж</span><button class="btn primary" data-close>Готово</button></div>`);
+  sheet.querySelectorAll("[data-paint]").forEach(b=> b.onclick = ()=>{
+    const i = +b.dataset.paint;
+    if(i === S.color || S.money < PAINT_COST) return;
+    S.money -= PAINT_COST; S.color = i; S.dirt = 0;
+    applyTaxiColor(); sfx("level");
+    toast(`Такси теперь «${PAINTS[i].name}»`, "цвет сохранён", "good");
+    taskProgress("paint", 1);
+    save(); paintHUD(); paintSheet();
+  });
+  bindClose();
+}
+function modeCards(){
+  return `<div class="modes">
+    <button class="mode ${calm() ? "on" : ""}" data-mode="calm"><b>Спокойный</b><span>Без патруля и штрафов. Опоздал — просто меньше чаевых.</span></button>
+    <button class="mode ${calm() ? "" : "on"}" data-mode="patrol"><b>С патрулём</b><span>За аварии и красный свет гонится патруль. Заказ можно сорвать.</span></button>
+  </div>`;
+}
+function bindModes(again){
+  sheet.querySelectorAll("[data-mode]").forEach(b=> b.onclick = ()=>{
+    S.mode = b.dataset.mode;
+    if(calm()){ heat = 0; clearCops(); }
+    save(); paintHUD(); sfx("ui"); again();
+  });
+}
+function menuSheet(confirmReset){
+  openSheet(`<h2>Пауза</h2><div class="sub">Пассажир подождёт. Руль: ← → или A D, газ ↑ W, тормоз ↓ S.</div>
+    ${modeCards()}
+    <div class="menu">
+      <button class="btn" data-garage>Гараж</button>
+      <button class="btn" data-crew>Водители</button>
+      <button class="btn" data-sound>${SND.on ? "Выключить звук" : "Включить звук"}</button>
+      <button class="btn" data-hand>Закончить смену</button>
+    </div>
+    <div class="foot" style="flex-wrap:wrap">
+      ${confirmReset ? `<span class="label" style="color:var(--coral)">Стереть деньги, водителей, наклейки?</span>
+        <span style="display:flex;gap:8px"><button class="btn" data-keep>Нет</button><button class="btn danger" data-wipe>Да, стереть</button></span>`
+      : `<button class="btn danger" data-reset>Начать заново</button><button class="btn primary" data-close>Продолжить</button>`}
+    </div>`);
+  bindModes(()=> menuSheet(false));
+  sheet.querySelector("[data-garage]").onclick = garage;
+  sheet.querySelector("[data-crew]").onclick = crew;
+  sheet.querySelector("[data-sound]").onclick = ()=>{ toggleSound(); menuSheet(false); };
+  sheet.querySelector("[data-hand]").onclick = ()=>
+    endShift("Смена окончена", `За смену ${S.shiftOrders} поездок. Выручка в кассе.`);
+  if(confirmReset){
+    sheet.querySelector("[data-keep]").onclick = ()=> menuSheet(false);
+    sheet.querySelector("[data-wipe]").onclick = ()=>{
+      S.money=0; S.orders=0; S.rating=5; S.driver=0; S.unlocked=1; S.up={motor:0,boost:0,tyres:0,meterUp:0,charm:0};
+      S.fails=0; S.record={money:0,orders:0}; S.shiftMoney=0; S.shiftOrders=0; S.shiftFails=0;
+      S.color=0; S.fuel=1; S.dirt=0; S.stars=0; S.album={}; S.daily=null;
+      heat=0; clearCops(); hideWaiting(); taxiPax(null); ensureDaily(); applyTaxiColor();
+      save(); paintHUD(); closeSheet(); newOrder();
+    };
+  } else {
+    sheet.querySelector("[data-reset]").onclick = ()=> menuSheet(true);
+    bindClose();
+  }
+}
+const pauseMenu = ()=> menuSheet(false);
 el("btnView").onclick = nextView;
-el("btnSound").onclick = toggleSound;
-el("btnSound").textContent = S.muted ? "Тихо" : "Звук";
+el("btnTasks").onclick = ()=>{ if(S.started) tasksSheet(); };
+el("btnAlbum").onclick = ()=>{ if(S.started) albumSheet(); };
+el("btnMenu").onclick = ()=>{ if(S.started) pauseMenu(); };
 
 function startSheet(){
   const a = CREW[S.driver];
   openSheet(`<div class="hero">${avatar(a,88)}<div>
     <h2>Хвостоград Такси 3D</h2>
-    <div class="sub" style="margin-bottom:0">Полдень в зверином квартале, камера за кормой. За рулём ${a.name}, ${a.kind}: подбираете пассажира у зелёного столба и везёте к красному. Счётчик тикает, чаевые тают вместе с терпением.</div></div></div>
-    <div class="keys"><kbd>A</kbd> <kbd>D</kbd> или ← → — руль · <kbd>W</kbd> ↑ — газ · <kbd>S</kbd> ↓ — тормоз и задний ход · <kbd>C</kbd> — камера · <kbd>M</kbd> — звук<br>
-    По улицам идёт встречный поток, ходят пешеходы и работают светофоры. ДТП, красный свет и наезд на тротуаре поднимают розыск — патруль догонит и выпишет штраф.<br>
-    Пассажир ждёт не вечно: терпение кончилось — заказ сорван и рейтинг падает. Ниже 2,00 диспетчер снимает с линии.<br>
-    Каждые 10 заказов в парк приходит новое животное со своим перком. Выручка тратится в гараже. За смену город успевает прожить сутки.</div>
-    <div class="foot"><span class="label">${S.record.money ? `рекорд смены ${S.record.money.toLocaleString("ru-RU")} ж · ${S.record.orders} зак.` : (S.orders ? `в кассе ${Math.round(S.money).toLocaleString("ru-RU")} ж` : "смена первая")}</span>
-    <button class="btn primary" data-go>${S.orders ? "Продолжить смену" : "Выйти на линию"}</button></div>`);
+    <div class="sub" style="margin-bottom:0">За рулём ${a.name}. Забирай пассажира у зелёного столба, вези к красному.</div></div></div>
+    ${modeCards()}
+    <div class="keys">Руль: <kbd>←</kbd> <kbd>→</kbd> или <kbd>A</kbd> <kbd>D</kbd> · газ <kbd>↑</kbd> <kbd>W</kbd> · тормоз <kbd>↓</kbd> <kbd>S</kbd> · камера <kbd>C</kbd><br>
+    На телефоне — кнопки внизу экрана.<br>
+    Бензин кончается — заезжай на заправку <b>З</b>. Такси пачкается — мойка <b>М</b>. Новый цвет — покраска <b>П</b>.</div>
+    <div class="foot"><span class="label">${S.orders ? `в кассе ${fmt(S.money)} ж · ★ ${S.stars}` : "первая смена"}</span>
+    <button class="btn primary" data-go>${S.orders ? "Продолжить" : "Поехали!"}</button></div>`);
+  bindModes(startSheet);
   sheet.querySelector("[data-go]").onclick = ()=>{
     audioBoot();
     S.started = true; veil.hidden = true; S.paused = false;
     S.shiftMoney = 0; S.shiftOrders = 0; S.shiftFails = 0;
     newOrder(); paintHUD();
+    if(ensureDaily()) setTimeout(()=> toast("Новые задания на сегодня", "кнопка «Задания»"), 800);
   };
 }
 
@@ -1585,6 +2222,7 @@ function loop(t){
 resize();
 for(let i=0;i<MAX_TRAFFIC;i++) spawnTraffic();
 updatePeds(0);
+ensureDaily(); applyTaxiColor();
 paintHUD(); paintOrder(); startSheet();
 requestAnimationFrame(loop);
 </script>
