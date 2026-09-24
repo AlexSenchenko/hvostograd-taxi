@@ -2445,7 +2445,7 @@ const NET_HOME = "https://alexsenchenko.github.io/hvostograd-taxi/";
 const NET_MAX = 6, NET_HZ = 10, NET_DELAY = 0.14, NET_QUIET = 7;
 const REACTS = {hi:{icon:"👋", text:"Привет!"}, yay:{icon:"🎉", text:"Ура!"}, honk:{icon:"📣", text:"Би-би!"}};
 const NET = {st:"off", peer:null, host:false, word:0, num:0, me:"", conns:[], hostConn:null, hostSeen:0,
-  others:new Map(), team:0, timer:0, tick:0, err:"", pickW:-1, lastReact:0};
+  others:new Map(), team:0, timer:0, tick:0, err:"", pickW:-1, lastReact:0, lastTick:0, seq:1};
 const nowS = ()=> performance.now()/1000;
 const roomName = ()=> NET_WORDS[NET.word] + "-" + NET.num;
 const roomId = (w, n)=> NET_PREFIX + w + "-" + n;
@@ -2564,6 +2564,8 @@ function netTick(){
   netSend({t:"s", id:NET.me, x:Math.round(car.x*10)/10, y:Math.round(car.y*10)/10, a:Math.round(car.a*1000)/1000,
     c:S.color, d:S.driver});
   const now = nowS();
+  if(now - NET.lastTick > 2){ NET.hostSeen = now; for(const o of NET.others.values()) o.seen = now; }   // страница спала — это не тишина друзей
+  NET.lastTick = now;
   for(const [id, o] of NET.others) if(now - o.seen > NET_QUIET) netGone(id);
   if(!NET.host && now - NET.hostSeen > NET_QUIET) netLost();
 }
@@ -2607,15 +2609,14 @@ function dropSprite(sp){ if(!sp) return; sp.parent && sp.parent.remove(sp); sp.m
 function netState(m){
   if(m.id === NET.me || !isFinite(m.x) || !isFinite(m.y) || !isFinite(m.a)) return;
   const d = idx(m.d, CREW.length), c = idx(m.c, PAINTS.length), now = nowS();
-  let o = NET.others.get(m.id);
+  let o = NET.others.get(m.id), fresh = false;
   if(!o){
     if(NET.others.size >= NET_MAX) return;
-    o = {id:m.id, buf:[], seen:now, mesh:makeTaxi(), head:null, label:null, bubble:null, bubbleT:0, d:-1, c:-1, x:m.x, y:m.y};
+    o = {id:m.id, no:++NET.seq, buf:[], seen:now, mesh:makeTaxi(), head:null, label:null, bubble:null, bubbleT:0, d:-1, c:-1, x:m.x, y:m.y};
     o.mesh.traverse(p=>{ p.castShadow = false; });
     o.mesh.position.set(m.x, 0, m.y);
     for(const b of o.mesh.userData.night) b.visible = taxi.userData.night[0].visible;
-    scene.add(o.mesh); NET.others.set(m.id, o);
-    toast(`${CREW[d].name} в городе!`, "друг подключился", "good"); sfx("ui");
+    scene.add(o.mesh); NET.others.set(m.id, o); fresh = true;
   }
   o.seen = now;
   o.buf.push({t:now, x:m.x, y:m.y, a:m.a});
@@ -2629,10 +2630,15 @@ function netState(m){
     const p = o.mesh.userData.paint;
     p.body.color.set(PAINTS[c].c); p.hood.color.set(PAINTS[c].c).multiplyScalar(0.86);
     dropSprite(o.label);
-    o.label = pill(CREW[d].name, PAINTS[c].c, "#FFFFFF", "#1F2A2E"); o.label.position.set(0, 30, 0); o.mesh.add(o.label);
+    o.label = pill(oname(o), PAINTS[c].c, "#FFFFFF", "#1F2A2E"); o.label.position.set(0, 30, 0); o.mesh.add(o.label);
     o.c = c;
   }
+  if(fresh){ toast(`${oname(o)} в городе!`, "друг подключился", "good"); sfx("ui"); }
   netPaintBar();
+}
+function oname(o){                                   // два Мартына в комнате — у второго номер
+  const d = Math.max(0, o.d), dup = d === S.driver || [...NET.others.values()].some(x=> x !== o && x.d === d);
+  return CREW[d].name + (dup ? " " + o.no : "");
 }
 function netGone(id, quiet){
   const o = NET.others.get(id); if(!o) return;
@@ -2642,7 +2648,7 @@ function netGone(id, quiet){
   if(o.head) freeHead(o.head);
   for(const b of o.mesh.userData.night) b.geometry.dispose();
   o.mesh.traverse(p=>{ if(p.material && p.material !== darkMat && p.material !== glassMat) p.material.dispose(); });
-  if(!quiet) toast(`${CREW[Math.max(0, o.d)].name} уехал домой`, "");
+  if(!quiet) toast(`${oname(o)} уехал домой`, "");
   netPaintBar();
 }
 function bubble(k){
@@ -2659,7 +2665,7 @@ function netReactSend(k){
 function netReact(id, k){
   const o = NET.others.get(id); if(!o || !REACTS[k]) return;
   dropSprite(o.bubble); o.bubble = bubble(k); o.mesh.add(o.bubble); o.bubbleT = 2.6;
-  toast(`${CREW[Math.max(0, o.d)].name}: ${REACTS[k].text}`, "");
+  toast(`${oname(o)}: ${REACTS[k].text}`, "");
   sfx(k === "honk" ? "honk" : "ui");
 }
 function netFrame(dt){
@@ -2700,7 +2706,7 @@ function netSheet(){
   const cont = S.started ? "На линию" : "Дальше";
   let body;
   if(NET.st === "on"){
-    const names = [CREW[S.driver].name + " (ты)", ...[...NET.others.values()].map(o=> CREW[Math.max(0, o.d)].name)].join(", ");
+    const names = [CREW[S.driver].name + " (ты)", ...[...NET.others.values()].map(oname)].join(", ");
     body = `<h2>Комната друзей</h2>
       <div class="sub">${NET.host ? "Скажи друзьям слово и число — пусть нажмут «Играть с друзьями» и выберут «Комната друга»."
         : "Ты в комнате друга."} Сейчас в городе: ${names}.</div>
