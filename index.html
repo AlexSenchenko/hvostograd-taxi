@@ -353,12 +353,12 @@ const S = {
   started:false, paused:true, order:null, lastBump:-9,
   fails:0, shiftMoney:0, shiftOrders:0, shiftFails:0,
   record:{money:0, orders:0}, muted:false,
-  mode:"calm", color:0, fuel:1, dirt:0, stars:0, album:{}, daily:null
+  mode:"calm", quality:"auto", color:0, fuel:1, dirt:0, stars:0, album:{}, daily:null
 };
 const SAVE = "hvostograd-taxi-3d-v1";
 function save(){ try{ localStorage.setItem(SAVE, JSON.stringify({money:S.money,orders:S.orders,rating:S.rating,driver:S.driver,
   unlocked:S.unlocked,up:S.up,fails:S.fails,record:S.record,muted:S.muted,
-  mode:S.mode,color:S.color,fuel:S.fuel,dirt:S.dirt,stars:S.stars,album:S.album,daily:S.daily})); }catch(e){} }
+  mode:S.mode,quality:S.quality,color:S.color,fuel:S.fuel,dirt:S.dirt,stars:S.stars,album:S.album,daily:S.daily})); }catch(e){} }
 const num = (v, lo, hi, def)=> (typeof v === "number" && isFinite(v)) ? Math.max(lo, Math.min(hi, v)) : def;
 function load(){ try{ const r=localStorage.getItem(SAVE); if(!r) return; const d=JSON.parse(r);
   if(d && typeof d.money==="number"){ S.money=num(d.money,0,1e9,0); S.orders=num(d.orders,0,1e7,0)|0; S.rating=num(d.rating,1,5,5);
@@ -368,6 +368,7 @@ function load(){ try{ const r=localStorage.getItem(SAVE); if(!r) return; const d
     S.fails=num(d.fails,0,1e7,0)|0; S.muted=!!d.muted;
     if(d.record && typeof d.record.money==="number") S.record={money:d.record.money|0, orders:d.record.orders|0};
     S.mode = d.mode === "patrol" ? "patrol" : "calm";
+    S.quality = ["auto","0","1","2"].includes(d.quality) ? d.quality : "auto";
     S.color = num(d.color,0,PAINTS.length-1,0)|0;
     S.fuel = num(d.fuel,0,1,1); S.dirt = num(d.dirt,0,1,0);
     S.stars = num(d.stars,0,1e7,0)|0;
@@ -382,8 +383,8 @@ const rnd = mulberry32(20260904);
 const R = (a,b)=> a + rnd()*(b-a);
 const RI = (a,b)=> Math.floor(R(a,b+1));
 
-const FACADE = ["#EDE1CC","#DCC7A9","#E6D2B8","#D2C4B2","#F0E6D6","#D8CBB8","#C9BCA8"];
-const ROOFC  = ["#C1583F","#CE7049","#B0604B","#A85F45","#8FA5A0"];
+const FACADE = ["#F6C28B","#9FD0EE","#F5A9A0","#BFE08F","#F8DD7A","#CDB1EC","#F9CFA6","#A6DCCB","#F3EBDD"];
+const ROOFC  = ["#E0603F","#D9493A","#3F8FC9","#7B5EA7","#E88A2E","#2E9E7A","#C9503D"];
 const blocks = [];
 for(let gy=0; gy<GH; gy++){
   blocks[gy] = [];
@@ -441,6 +442,7 @@ for(let gy=0; gy<GH; gy++) for(let gx=0; gx<GW; gx++) for(const bd of blocks[gy]
   }
 }
 
+const pitched = bd => !bd.station && bd.ht < 75;
 function blockAt(x,y){
   const gx = Math.floor(x/CELL), gy = Math.floor(y/CELL);
   if(gx<0||gy<0||gx>=GW||gy>=GH) return null;
@@ -762,8 +764,8 @@ renderer.shadowMap.enabled = true;
 renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 
 const scene = new THREE.Scene();
-scene.background = new THREE.Color("#CFE3EC");
-scene.fog = new THREE.Fog("#CFE3EC", 520, 1500);
+scene.background = new THREE.Color("#A9D8F2");
+scene.fog = new THREE.Fog("#A9D8F2", 520, 1500);
 
 const camera = new THREE.PerspectiveCamera(56, 1, 1, 2800);
 let viewMode = 0;                                  // 0 — сзади, 1 — сверху, 2 — на водителя
@@ -791,7 +793,7 @@ function groundTexture(){
   g.fillStyle = "#8E9A9B"; g.fillRect(0, 0, WW, WH);
   for(let gy=0; gy<GH; gy++) for(let gx=0; gx<GW; gx++){
     const b = blocks[gy][gx];
-    g.fillStyle = b.park ? "#7FB964" : "#BDC3BA";
+    g.fillStyle = b.park ? "#70BA58" : "#C4BCAC";
     g.fillRect(b.ox-8, b.oy-8, BLOCK+16, BLOCK+16);
   }
   g.strokeStyle = "rgba(255,255,255,.85)"; g.lineWidth = 3; g.setLineDash([16,18]);
@@ -824,6 +826,20 @@ scene.add(ground);
 
 const BOXG = new THREE.BoxGeometry(1,1,1);
 
+/* --- за городом: луг и мягкие холмы, чтобы край карты не обрывался в пустоту --- */
+{
+  const meadow = new THREE.Mesh(new THREE.PlaneGeometry(WW + 4000, WH + 4000), new THREE.MeshLambertMaterial({color:"#8CCB6A"}));
+  meadow.rotation.x = -Math.PI/2; meadow.position.set(WW/2, -0.6, WH/2); meadow.receiveShadow = true;
+  scene.add(meadow);
+  const hrnd = mulberry32(99), hl = [];
+  for(let i=0; i<26; i++){
+    const a = i/26*Math.PI*2 + hrnd()*0.2, rx = WW/2 + 700 + hrnd()*300, rz = WH/2 + 650 + hrnd()*300, r = 260 + hrnd()*220;
+    hl.push({x:WW/2 + Math.cos(a)*rx, z:WH/2 + Math.sin(a)*rz, r, h:90 + hrnd()*120, c:["#6DB65A","#7FC363","#5EA852","#93CF6E"][i % 4]});
+  }
+  instanced(new THREE.SphereGeometry(1, 16, 8, 0, Math.PI*2, 0, Math.PI/2), hl, it => it.c,
+    (it, m)=>{ m.makeScale(it.r, it.h, it.r*0.8); m.setPosition(it.x, -1, it.z); });
+}
+
 /* одна InstancedMesh на цвет — надёжнее, чем per-instance цвета, и всё те же единицы вызовов */
 function instanced(geo, items, colorOf, place, opts){
   const groups = new Map(), m = new THREE.Matrix4(), out = [];
@@ -848,7 +864,7 @@ function instanced(geo, items, colorOf, place, opts){
 {
   const list = [];
   for(let gy=0; gy<GH; gy++) for(let gx=0; gx<GW; gx++) list.push(blocks[gy][gx]);
-  instanced(BOXG, list, b => b.park ? "#83C069" : "#C6CCC2",
+  instanced(BOXG, list, b => b.park ? "#74BE5B" : "#C9C1B1",
     (b, m)=>{ m.makeScale(BLOCK+16, CURB, BLOCK+16); m.setPosition(b.ox+BLOCK/2, CURB/2, b.oy+BLOCK/2); },
     {receive:true});
 }
@@ -860,9 +876,23 @@ function instanced(geo, items, colorOf, place, opts){
   instanced(BOXG, list, bd => bd.face,
     (bd, m)=>{ m.makeScale(bd.w, bd.ht, bd.h); m.setPosition(bd.x+bd.w/2, CURB + bd.ht/2, bd.y+bd.h/2); },
     {cast:true, receive:true});
-  instanced(BOXG, list, bd => bd.roof,
+  const flat = list.filter(bd => !pitched(bd)), peak = list.filter(pitched);
+  instanced(BOXG, flat, bd => bd.roof,
     (bd, m)=>{ m.makeScale(bd.w+3, 5, bd.h+3); m.setPosition(bd.x+bd.w/2, CURB + bd.ht + 2, bd.y+bd.h/2); },
     {cast:true});
+  // скатная крыша — треугольная призма, конёк вдоль длинной стороны
+  const tri = new THREE.Shape(); tri.moveTo(-0.5, 0); tri.lineTo(0.5, 0); tri.lineTo(0, 1); tri.lineTo(-0.5, 0);
+  const prism = new THREE.ExtrudeGeometry(tri, {depth:1, bevelEnabled:false}); prism.translate(0, 0, -0.5);
+  const q = new THREE.Quaternion(), qy = new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0,1,0), Math.PI/2),
+        pv = new THREE.Vector3(), sv = new THREE.Vector3();
+  instanced(prism, peak, bd => bd.roof, (bd, m)=>{
+    const along = bd.w > bd.h, across = (along ? bd.h : bd.w) + 6, len = (along ? bd.w : bd.h) + 6;
+    pv.set(bd.x+bd.w/2, CURB + bd.ht, bd.y+bd.h/2); sv.set(across, Math.min(34, across*0.42), len);
+    m.compose(pv, along ? qy : q.identity(), sv);
+  }, {cast:true});
+  // надстройки на плоских крышах: будка и бак
+  instanced(BOXG, flat.filter(bd => bd.w > 40 && bd.h > 40), ()=> "#E9E2D4",
+    (bd, m)=>{ m.makeScale(14, 9, 12); m.setPosition(bd.x+bd.w*0.3, CURB + bd.ht + 9, bd.y+bd.h*0.35); }, {cast:true});
 }
 
 /* --- деревья --- */
@@ -872,10 +902,105 @@ function instanced(geo, items, colorOf, place, opts){
   instanced(new THREE.CylinderGeometry(1, 1.25, 1, 5), list, ()=> "#7A5A3C",
     (t, m)=>{ const th = t.h*0.4; m.makeScale(2.2, th, 2.2); m.setPosition(t.x, CURB + th/2, t.y); },
     {cast:true});
-  instanced(new THREE.ConeGeometry(1, 1, 7), list, t => Math.round(t.x) % 3 ? "#4C9A50" : "#61B25C",
+  const round = t => Math.round(t.x*7) % 5 < 3;
+  instanced(new THREE.ConeGeometry(1, 1, 8), list.filter(t => !round(t)), t => Math.round(t.x) % 3 ? "#3E9A4E" : "#55B35A",
     (t, m)=>{ const th = t.h*0.4; m.makeScale(t.r, t.h, t.r); m.setPosition(t.x, CURB + th + t.h/2 - 3, t.y); },
     {cast:true});
+  const crown = new THREE.SphereGeometry(1, 9, 7);
+  instanced(crown, list.filter(round), t => ["#5DBB4F","#4FA845","#7BCB5A","#8CCF4E"][Math.round(t.y) % 4],
+    (t, m)=>{ const th = t.h*0.4, r = t.r*1.15; m.makeScale(r, r*0.95, r); m.setPosition(t.x, CURB + th + r*0.7, t.y); },
+    {cast:true});
 }
+
+/* --- уют: маркизы, вывески, балконы, кусты, клумбы — «декор», гасится на простом качестве --- */
+const DECOR = [];
+{
+  const drnd = mulberry32(777), DR = (a,b)=> a + drnd()*(b-a);
+  const AWN = ["#E4574B","#3C8FD8","#F2A93C","#3FA35B","#D65A9C","#8E6BD6"];
+  const aw = [], sign = [], slab = [], rail = [], bush = [], dirt = [], flower = [], m0 = new THREE.Matrix4();
+  // фасад дома, обращённый к ближайшей улице
+  const front = (bd, b)=>{
+    const d = [bd.y - b.oy, b.oy + BLOCK - bd.y - bd.h, bd.x - b.ox, b.ox + BLOCK - bd.x - bd.w];
+    return d.indexOf(Math.min(...d));
+  };
+  const at = (bd, side, off, y, len, thick, depth, along)=>{
+    const cx = bd.x + bd.w/2 + (side < 2 ? along : 0), cz = bd.y + bd.h/2 + (side >= 2 ? along : 0);
+    if(side === 0) return {x:cx, y, z:bd.y - off, sx:len, sy:thick, sz:depth};
+    if(side === 1) return {x:cx, y, z:bd.y + bd.h + off, sx:len, sy:thick, sz:depth};
+    if(side === 2) return {x:bd.x - off, y, z:cz, sx:depth, sy:thick, sz:len};
+    return {x:bd.x + bd.w + off, y, z:cz, sx:depth, sy:thick, sz:len};
+  };
+  const inside = (b, x, y, pad)=> b.buildings.some(bd => x > bd.x-pad && x < bd.x+bd.w+pad && y > bd.y-pad && y < bd.y+bd.h+pad);
+  for(let gy=0; gy<GH; gy++) for(let gx=0; gx<GW; gx++){
+    const b = blocks[gy][gx];
+    for(const bd of b.buildings){
+      if(bd.station) continue;
+      const side = front(bd, b), flen = side < 2 ? bd.w : bd.h;
+      if(bd.ht < 70 && drnd() < 0.7){
+        const c = AWN[Math.floor(drnd()*AWN.length)];
+        aw.push({...at(bd, side, 5, CURB + 15, flen*0.62, 1.6, 10, 0), c});
+        aw.push({...at(bd, side, 10, CURB + 13.2, flen*0.62, 3.4, 0.8, 0), c:"#FFFFFF"});
+        sign.push({...at(bd, side, 0.8, CURB + 23, flen*0.42, 6, 1.2, 0), c:AWN[Math.floor(drnd()*AWN.length)]});
+      } else if(bd.ht >= 60 && flen > 34){
+        const cols = flen > 70 ? [-flen/4, flen/4] : [0];
+        for(let y = CURB + 32; y < CURB + bd.ht - 12; y += 26) for(const a of cols){
+          slab.push(at(bd, side, 3, y, 15, 1.6, 6, a));
+          rail.push(at(bd, side, 5.6, y + 2.8, 15, 4, 0.8, a));
+        }
+      }
+    }
+    // кусты и клумбы на свободных местах квартала
+    const tries = b.park ? 14 : 8;
+    for(let k=0; k<tries; k++){
+      const x = b.ox + DR(10, BLOCK-10), y = b.oy + DR(10, BLOCK-10);
+      if(inside(b, x, y, 7) || (b.station && y < b.oy + 120)) continue;
+      if(drnd() < (b.park ? 0.35 : 0.3)){
+        dirt.push({x, y:CURB + 1.2, z:y, sx:20, sy:2.4, sz:11, c:"#8B5E3C"});
+        const FL = ["#E4574B","#F7D774","#F59AC4","#FFFFFF","#B784E0"];
+        for(let f=0; f<7; f++) flower.push({x:x + DR(-8,8), y:CURB + 3.2, z:y + DR(-4,4), sx:1.8, sy:1.8, sz:1.8, c:FL[f % FL.length]});
+      } else {
+        const r = DR(4, 7);
+        bush.push({x, y:CURB + r*0.55, z:y, sx:r*1.2, sy:r, sz:r*1.2, c:drnd() < 0.5 ? "#4FAE4A" : "#6CC158"});
+      }
+    }
+  }
+  const put = (it, m)=>{ m.makeScale(it.sx, it.sy, it.sz); m.setPosition(it.x, it.y, it.z); };
+  const ball = new THREE.IcosahedronGeometry(1, 1);
+  DECOR.push(...instanced(BOXG, aw, it => it.c, put, {cast:true}));
+  DECOR.push(...instanced(BOXG, sign, it => it.c, put));
+  DECOR.push(...instanced(BOXG, slab, ()=> "#F7F3EA", put, {cast:true}));
+  DECOR.push(...instanced(BOXG, rail, ()=> "#5E6E7A", put));
+  DECOR.push(...instanced(ball, bush, it => it.c, put));
+  DECOR.push(...instanced(BOXG, dirt, it => it.c, put));
+  DECOR.push(...instanced(BOXG, flower, it => it.c, put));
+}
+
+/* --- облака: пухлые шары, медленно плывут --- */
+const cloudMat = new THREE.MeshLambertMaterial({color:"#FFFFFF", emissive:"#DDE8F0", fog:false});
+const CLOUDS = [];
+{
+  const crnd = mulberry32(4242);
+  for(let i=0; i<11; i++){
+    const cx = -500 + crnd()*(WW+1000), cz = -400 + crnd()*(WH+800), cy = 250 + crnd()*80, sp = 5 + crnd()*5;
+    const n = 4 + Math.floor(crnd()*3);
+    for(let k=0; k<n; k++){
+      const r = 16 + crnd()*16;
+      CLOUDS.push({x:cx + (k - n/2)*r*0.9, y:cy + crnd()*8, z:cz + (crnd()-0.5)*r, r, sp});
+    }
+  }
+}
+const cloudMesh = new THREE.InstancedMesh(new THREE.SphereGeometry(1, 10, 8), cloudMat, CLOUDS.length);
+cloudMesh.frustumCulled = false; scene.add(cloudMesh);
+const _cm = new THREE.Matrix4();
+function updateClouds(dt){
+  const span = WW + 1200;
+  CLOUDS.forEach((c, i)=>{
+    c.x += c.sp*dt; if(c.x > WW + 600) c.x -= span;
+    _cm.makeScale(c.r*1.25, c.r*0.8, c.r); _cm.setPosition(c.x, c.y, c.z); cloudMesh.setMatrixAt(i, _cm);
+  });
+  cloudMesh.instanceMatrix.needsUpdate = true;
+}
+updateClouds(0);
 
 /* --- светофоры: две группы ламп, цвет меняем на материале --- */
 const lampMat = {v:new THREE.MeshBasicMaterial({color:"#39B356"}), h:new THREE.MeshBasicMaterial({color:"#E2453A"})};
@@ -913,7 +1038,7 @@ const winMesh = new THREE.InstancedMesh(BOXG, new THREE.MeshBasicMaterial({color
   const m = new THREE.Matrix4();
   WINDOWS.forEach((w,i)=>{ m.makeScale(w.sx, w.sy, w.sz); m.setPosition(w.x, w.y, w.z); winMesh.setMatrixAt(i, m); });
   winMesh.instanceMatrix.needsUpdate = true;
-  winMesh.frustumCulled = false; winMesh.visible = false;
+  winMesh.frustumCulled = false;
   scene.add(winMesh);
 }
 
@@ -938,13 +1063,15 @@ const lampGlow = new THREE.Group(); lampGlow.visible = false; scene.add(lampGlow
 /* --- сутки: от полудня через закат к ночи и обратно --- */
 const DAYLEN = 300;
 const PHASES = [
-  {t:0.00, sky:"#CFE3EC", sun:"#FFF1DC", si:1.05, hs:"#DCEEF7", hg:"#93A184", hi:0.62, el:320, near:520, far:1500, night:0},
+  {t:0.00, sky:"#A9D8F2", sun:"#FFF1DC", si:0.92, hs:"#CFE8F7", hg:"#86A874", hi:0.58, el:320, near:520, far:1500, night:0},
   {t:0.40, sky:"#F0C193", sun:"#FFB16A", si:0.86, hs:"#F6D9BC", hg:"#8C7C68", hi:0.54, el:110, near:430, far:1380, night:0.12},
   {t:0.55, sky:"#26334C", sun:"#8FA6D8", si:0.20, hs:"#3B4C6E", hg:"#1C2434", hi:0.30, el:270, near:210, far:820,  night:1},
   {t:0.84, sky:"#6E7CA0", sun:"#D3BCE6", si:0.44, hs:"#8494B6", hg:"#3E4658", hi:0.44, el:190, near:340, far:1120, night:0.55},
-  {t:1.00, sky:"#CFE3EC", sun:"#FFF1DC", si:1.05, hs:"#DCEEF7", hg:"#93A184", hi:0.62, el:320, near:520, far:1500, night:0}
+  {t:1.00, sky:"#A9D8F2", sun:"#FFF1DC", si:0.92, hs:"#CFE8F7", hg:"#86A874", hi:0.58, el:320, near:520, far:1500, night:0}
 ];
 let nightF = 0, dayT = 0;
+const WIN_DAY = new THREE.Color("#6FA3C4"), WIN_NIGHT = new THREE.Color("#FFD79A"),
+  WIN_WHITE = new THREE.Color("#FFFFFF"), WIN_DUSK = new THREE.Color("#5A6788"), CLOUD_EM = new THREE.Color("#DDE8F0");
 const cA = new THREE.Color(), cB = new THREE.Color();
 const lerpN = (a,b,k)=> a + (b-a)*k;
 function updateSky(){
@@ -964,7 +1091,9 @@ function updateSky(){
   SUN_OFF.set(Math.cos(ang)*245, lerpN(a.el, b.el, k), Math.sin(ang)*245);
   nightF = lerpN(a.night, b.night, k);
   const dark = nightF > 0.3;
-  winMesh.visible = dark; lampGlow.visible = dark;
+  lampGlow.visible = dark;
+  winMesh.material.color.copy(WIN_DAY).lerp(WIN_NIGHT, Math.min(1, nightF*1.6));
+  cloudMat.color.copy(WIN_WHITE).lerp(WIN_DUSK, nightF); cloudMat.emissive.copy(CLOUD_EM).multiplyScalar(1 - nightF*0.85);
   if(taxi) for(const o of taxi.userData.night) o.visible = dark;
 }
 const cityTime = ()=>{
@@ -1577,6 +1706,7 @@ function syncScene(dt){
   updateSkids(dt);
   updateFigs(dt);
   updateStationFx(dt);
+  updateClouds(dt);
 
   const empty = S.fuel <= 0, tg = empty ? navTarget() : target();
   if(tg && S.started){
@@ -1635,6 +1765,37 @@ function syncScene(dt){
     camera.rotation.z += (Math.random()-0.5)*shake*0.006;
     shake *= Math.exp(-dt*4.5);
   } else shake = 0;
+}
+/* ---------- качество: 2 — высокое, 1 — среднее, 0 — простое (без теней и мелкого декора) ---------- */
+const QUAL = [{pr:1, sh:0}, {pr:1.35, sh:1024}, {pr:1.8, sh:2048}];
+const QNAME = {auto:"авто", "2":"высокая", "1":"средняя", "0":"простая"};
+const coarse = matchMedia("(pointer:coarse)").matches;
+let qLevel = -1;
+function applyQuality(l){
+  l = Math.max(0, Math.min(2, l));
+  if(l === qLevel) return;
+  qLevel = l;
+  const Q = QUAL[l];
+  renderer.setPixelRatio(Math.min(devicePixelRatio || 1, Q.pr));
+  sun.castShadow = Q.sh > 0;
+  if(Q.sh && sun.shadow.mapSize.x !== Q.sh){
+    sun.shadow.mapSize.set(Q.sh, Q.sh);
+    if(sun.shadow.map){ sun.shadow.map.dispose(); sun.shadow.map = null; }
+  }
+  for(const d of DECOR) d.visible = l > 0;
+  resize();
+}
+function pickQuality(){ applyQuality(S.quality === "auto" ? (coarse ? 1 : 2) : +S.quality); }
+// авто: после прогрева мерим средний кадр окнами по 3 с; два плохих окна подряд — ступенька вниз
+const perf = {warm:4, t:0, n:0, bad:0};
+function watchPerf(raw){
+  if(S.quality !== "auto" || S.paused || !S.started || document.hidden || raw > 0.25 || qLevel <= 0) return;
+  if(perf.warm > 0){ perf.warm -= raw; return; }
+  perf.t += raw; perf.n++;
+  if(perf.t < 3) return;
+  const fps = perf.n / perf.t; perf.t = 0; perf.n = 0;
+  if(fps < 40){ if(++perf.bad >= 2){ perf.bad = 0; perf.warm = 3; applyQuality(qLevel - 1); } }
+  else perf.bad = 0;
 }
 function resize(){
   const w = cv.clientWidth, h = cv.clientHeight;
@@ -2155,6 +2316,7 @@ function menuSheet(confirmReset){
       <button class="btn" data-garage>Гараж</button>
       <button class="btn" data-crew>Водители</button>
       <button class="btn" data-sound>${SND.on ? "Выключить звук" : "Включить звук"}</button>
+      <button class="btn" data-qual>Графика: ${QNAME[S.quality]}${S.quality === "auto" ? ` (${QNAME[qLevel]})` : ""}</button>
       <button class="btn" data-hand>Закончить смену</button>
     </div>
     <div class="foot" style="flex-wrap:wrap">
@@ -2166,6 +2328,10 @@ function menuSheet(confirmReset){
   sheet.querySelector("[data-garage]").onclick = garage;
   sheet.querySelector("[data-crew]").onclick = crew;
   sheet.querySelector("[data-sound]").onclick = ()=>{ toggleSound(); menuSheet(false); };
+  sheet.querySelector("[data-qual]").onclick = ()=>{
+    const order = ["auto","2","1","0"]; S.quality = order[(order.indexOf(S.quality) + 1) % 4];
+    perf.warm = 4; perf.bad = 0; pickQuality(); save(); menuSheet(false);
+  };
   sheet.querySelector("[data-hand]").onclick = ()=>
     endShift("Смена окончена", `За смену ${S.shiftOrders} поездок. Выручка в кассе.`);
   if(confirmReset){
@@ -2212,14 +2378,15 @@ function startSheet(){
 /* ---------- цикл ---------- */
 let last = performance.now();
 function loop(t){
-  const dt = Math.min(0.045, (t - last)/1000); last = t;
+  const raw = (t - last)/1000, dt = Math.min(0.045, raw); last = t;
+  watchPerf(raw);
   if(!S.paused && S.started) update(dt);
   else clock += dt;                                  // светофоры и мигалки живут и на паузе
   syncScene(dt); drawMini(); paintLive(); audioFrame();
   renderer.render(scene, camera);
   requestAnimationFrame(loop);
 }
-resize();
+pickQuality();
 for(let i=0;i<MAX_TRAFFIC;i++) spawnTraffic();
 updatePeds(0);
 ensureDaily(); applyTaxiColor();
