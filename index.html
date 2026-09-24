@@ -1094,7 +1094,12 @@ function updateSky(){
   lampGlow.visible = dark;
   winMesh.material.color.copy(WIN_DAY).lerp(WIN_NIGHT, Math.min(1, nightF*1.6));
   cloudMat.color.copy(WIN_WHITE).lerp(WIN_DUSK, nightF); cloudMat.emissive.copy(CLOUD_EM).multiplyScalar(1 - nightF*0.85);
-  if(taxi) for(const o of taxi.userData.night) o.visible = dark;
+  if(taxi){
+    for(const o of taxi.userData.night) o.visible = dark;
+    const pt = taxi.userData.paint;                  // ночью такси чуть светится, чтобы не сливалось с дорогой
+    pt.body.emissive.copy(pt.body.color).multiplyScalar(nightF*0.32);
+    pt.hood.emissive.copy(pt.hood.color).multiplyScalar(nightF*0.32);
+  }
 }
 const cityTime = ()=>{
   const h = (11 + dayT*24) % 24;
