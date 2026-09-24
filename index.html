@@ -2145,7 +2145,9 @@ function paintHUD(){
   setDriverHead();
   paintBadge();
 }
+let goalDry = false;
 function paintOrder(){
+  goalDry = false;
   const o = S.order;
   if(!o){ el("goalText").textContent = S.started ? "Ищем пассажира…" : "Смена не начата"; el("addrText").textContent = "Хвостоград, парк такси"; el("distText").textContent = "—"; return; }
   const p = o.phase === "pickup", t = p ? o.from : o.to;
@@ -2176,7 +2178,8 @@ function paintLive(){
   const bar = el("patBar"), f = o.patience/o.patMax;
   bar.firstElementChild.style.width = (f*100).toFixed(1) + "%";
   bar.classList.toggle("low", f < 0.3);
-  if(S.fuel <= 0) el("goalText").innerHTML = `<span style="color:#E4574B">Бак пуст!</span> Ползём на заправку`;
+  const dry = S.fuel <= 0;
+  if(dry !== goalDry){ goalDry = dry; if(dry) el("goalText").innerHTML = `<span style="color:#E4574B">Бак пуст!</span> Ползём на заправку`; else paintOrder(); }
 }
 function toast(t, s, cls){
   const d = document.createElement("div");
