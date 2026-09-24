@@ -90,6 +90,17 @@ button{font:inherit;color:inherit;cursor:pointer}
   display:grid;place-items:center;font-size:24px;font-weight:800;user-select:none;touch-action:none;
   box-shadow:0 4px 12px rgba(31,54,54,.18)}
 #touch .pad.gas{background:var(--amber);border-color:var(--amber-deep);color:#241505}
+#touch .pad.fire{position:absolute;left:calc(50% - 32px);bottom:0;width:64px;height:64px;border-radius:50%;pointer-events:auto;
+  background:#4BA3E0;border-color:#2F7FB8;font-size:28px}
+#touch .pad.fire.act{background:#7CC0F0}
+@media (pointer:coarse) and (max-width:430px){
+  #touch .pad{width:64px;height:64px}
+  #touch .grp{gap:10px}
+}
+@media (pointer:coarse) and (max-width:370px){
+  #touch .pad{width:58px;height:58px}
+  #touch .pad.fire{width:56px;height:56px;left:calc(50% - 28px)}
+}
 #touch .pad.act{background:#FFB65A;color:#241505;transform:scale(.96)}
 @media (pointer:coarse){
   #touch{display:flex;position:absolute;left:0;right:0;bottom:12px;z-index:6;
@@ -303,6 +314,7 @@ button{font:inherit;color:inherit;cursor:pointer}
     <div id="touch">
       <div class="grp"><div class="pad" data-k="left">◀</div><div class="pad" data-k="right">▶</div></div>
       <div class="grp"><div class="pad" data-k="brake">▼</div><div class="pad gas" data-k="gas">▲</div></div>
+      <div class="pad fire" data-k="fire" aria-label="Водяной шарик">💦</div>
     </div>
 
     <div id="mapWrap" class="plate">
@@ -757,6 +769,9 @@ function sfx(kind){
   if(kind === "fail"){  blip(330, 0.16, "sawtooth", 0.18); blip(196, 0.34, "sawtooth", 0.18, 0.15); }
   if(kind === "ticket"){ blip(880, 0.14, "square", 0.2); blip(587, 0.14, "square", 0.2, 0.16); blip(392, 0.4, "square", 0.2, 0.32); }
   if(kind === "ui")     blip(720, 0.08, "triangle", 0.14);
+  if(kind === "shoot"){ blip(420, 0.1, "sine", 0.18); blip(640, 0.08, "sine", 0.1, 0.03); }
+  if(kind === "splat")  noiseBurst(0.16, 700, 0.26);
+  if(kind === "pop"){   noiseBurst(0.08, 2600, 0.5); blip(1320, 0.07, "square", 0.08); }
   if(kind === "honk"){  blip(392, 0.22, "square", 0.14); blip(494, 0.22, "square", 0.14); blip(392, 0.3, "square", 0.14, 0.28); blip(494, 0.3, "square", 0.14, 0.28); }
 }
 function audioFrame(){
@@ -1667,10 +1682,10 @@ const coinMesh = new THREE.InstancedMesh(new THREE.CylinderGeometry(2.6, 2.6, 0.
   new THREE.MeshLambertMaterial({color:"#F2B63C"}), COINS);
 coinMesh.count = 0; scene.add(coinMesh);
 const coinData = [];
-function coins(){
+function coins(x, y, z){
   coinData.length = 0;
   for(let i=0;i<COINS;i++) coinData.push({
-    x:car.x, y:16, z:car.y,
+    x: x === undefined ? car.x : x, y: y === undefined ? 16 : y, z: z === undefined ? car.y : z,
     vx:(Math.random()-0.5)*70, vy:70+Math.random()*70, vz:(Math.random()-0.5)*70,
     a:Math.random()*6, l:1.2
   });
@@ -1692,6 +1707,211 @@ function updateCoins(dt){
   }
   coinMesh.instanceMatrix.needsUpdate = true;
   if(!alive) coinMesh.count = 0;
+}
+
+/* --- водяные шарики с краской и воздушные шары --- */
+const SHOT_G = 170, SHOT_H = 260, FIRE_CD = 0.35;
+const shotMats = PAINTS.map(p=> new THREE.MeshLambertMaterial({color:p.c}));
+const shots = [];
+let fireCd = 0, fireTap = false;                     // короткое нажатие между кадрами тоже стреляет
+const _col = new THREE.Color();
+
+const BALLOONS = 12, BCOLS = ["#E4476B","#4BA3E0","#F2D43C","#8BCB3C","#A36BD6","#F57C2B","#F29BC4","#3CC6A8"];
+const balMesh = new THREE.InstancedMesh(SPH, new THREE.MeshLambertMaterial({color:"#ffffff", emissive:"#3a3a3a"}), BALLOONS);
+const strMesh = new THREE.InstancedMesh(new THREE.CylinderGeometry(0.18, 0.18, 1, 4), new THREE.MeshLambertMaterial({color:"#5E6468"}), BALLOONS);
+balMesh.castShadow = true; balMesh.frustumCulled = false; strMesh.frustumCulled = false;
+scene.add(balMesh); scene.add(strMesh);
+const balloons = [];
+function placeBalloon(b, far){
+  for(let k=0;k<30;k++){
+    if(Math.random() < 0.5){ b.x = roadX(Math.floor(Math.random()*(GW+1))); b.z = ROAD + Math.random()*(WH - 2*ROAD); }
+    else { b.z = roadY(Math.floor(Math.random()*(GH+1))); b.x = ROAD + Math.random()*(WW - 2*ROAD); }
+    if(!far || Math.hypot(b.x - car.x, b.z - car.y) > 220) break;
+  }
+  b.h = 24 + Math.random()*12; b.ph = Math.random()*6.283; b.gone = 0; b.y = b.h;
+  b.col = BCOLS[Math.floor(Math.random()*BCOLS.length)];
+  balMesh.setColorAt(b.i, _col.set(b.col)); balMesh.instanceColor.needsUpdate = true;
+}
+for(let i=0;i<BALLOONS;i++){ const b = {i}; balloons.push(b); placeBalloon(b, false); }
+function updateBalloons(dt){
+  const m = new THREE.Matrix4(), q = new THREE.Quaternion(), e = new THREE.Euler(), s = new THREE.Vector3(), p = new THREE.Vector3();
+  for(const b of balloons){
+    if(b.gone > 0){
+      b.gone -= dt;
+      if(b.gone <= 0) placeBalloon(b, true);
+      m.makeScale(0,0,0); balMesh.setMatrixAt(b.i, m); strMesh.setMatrixAt(b.i, m); continue;
+    }
+    b.y = b.h + Math.sin(clock*1.3 + b.ph)*2.2;
+    const sw = Math.sin(clock*0.9 + b.ph)*0.12;
+    e.set(sw, 0, sw*0.7); q.setFromEuler(e);
+    m.compose(p.set(b.x, b.y, b.z), q, s.set(6, 7.4, 6)); balMesh.setMatrixAt(b.i, m);
+    m.compose(p.set(b.x, b.y - 13, b.z), q, s.set(1, 12, 1)); strMesh.setMatrixAt(b.i, m);
+  }
+  balMesh.instanceMatrix.needsUpdate = true; strMesh.instanceMatrix.needsUpdate = true;
+}
+function balMini(sx, sy){
+  for(const b of balloons){
+    if(b.gone > 0) continue;
+    mx.fillStyle = b.col; mx.strokeStyle = "#ffffff"; mx.lineWidth = 1;
+    mx.beginPath(); mx.arc(b.x*sx, b.z*sy, 3, 0, 6.283); mx.fill(); mx.stroke();
+  }
+}
+
+/* брызги: капли разлетаются и ложатся кляксами */
+const SPLASH = 120;
+const splMesh = new THREE.InstancedMesh(SPH, new THREE.MeshLambertMaterial({color:"#ffffff"}), SPLASH);
+splMesh.frustumCulled = false; scene.add(splMesh);
+const splData = new Array(SPLASH).fill(null);
+let splI = 0;
+{
+  const m = new THREE.Matrix4().makeScale(0,0,0);
+  for(let i=0;i<SPLASH;i++){ splMesh.setMatrixAt(i, m); splMesh.setColorAt(i, _col.set("#ffffff")); }
+  splMesh.instanceMatrix.needsUpdate = true; splMesh.instanceColor.needsUpdate = true;
+}
+function splash(x, y, z, color, n){
+  _col.set(color);
+  for(let k=0;k<(n || 12);k++){
+    const a = Math.random()*6.283, v = 20 + Math.random()*45;
+    splData[splI] = {x, y, z, vx:Math.cos(a)*v, vy:25 + Math.random()*50, vz:Math.sin(a)*v, l:1.8, r:0.9 + Math.random()*1.1, flat:false};
+    splMesh.setColorAt(splI, _col);
+    splI = (splI + 1) % SPLASH;
+  }
+  splMesh.instanceColor.needsUpdate = true;
+}
+function updateSplash(dt){
+  const m = new THREE.Matrix4(), q = new THREE.Quaternion(), s = new THREE.Vector3(), p = new THREE.Vector3();
+  let dirty = false;
+  for(let i=0;i<SPLASH;i++){
+    const d = splData[i]; if(!d) continue;
+    dirty = true; d.l -= dt;
+    if(d.l <= 0){ splData[i] = null; m.makeScale(0,0,0); splMesh.setMatrixAt(i, m); continue; }
+    if(!d.flat){
+      d.vy -= 190*dt; d.x += d.vx*dt; d.y += d.vy*dt; d.z += d.vz*dt;
+      if(d.y <= 0.4){ d.y = 0.4; d.flat = true; }
+    }
+    const k = Math.min(1, d.l/0.6), r = d.r*k;
+    if(d.flat) s.set(r*1.9, 0.12, r*1.9); else s.set(r, r, r);
+    m.compose(p.set(d.x, d.y, d.z), q, s); splMesh.setMatrixAt(i, m);
+  }
+  if(dirty) splMesh.instanceMatrix.needsUpdate = true;
+}
+
+function spawnShot(x, y, z, vx, vy, vz, c, mine){
+  const mesh = new THREE.Mesh(SPH, shotMats[c]);
+  mesh.scale.set(2, 2, 2); mesh.position.set(x, y, z); scene.add(mesh);
+  shots.push({x, y, z, vx, vy, vz, c, mine, l:2.2, mesh});
+}
+function fire(){
+  if(fireCd > 0) return;
+  fireCd = FIRE_CD;
+  const c = Math.cos(car.a), s = Math.sin(car.a);
+  const x0 = car.x + c*13, y0 = 13, z0 = car.y + s*13, H = SHOT_H + Math.max(0, car.sp);
+  // мягкое автоприцеливание: ближайшая цель впереди (шар или такси друга)
+  let best = null, bestScore = 1e9;
+  const look = (tx, ty, tz)=>{
+    const dx = tx - x0, dz = tz - z0, D = Math.hypot(dx, dz);
+    if(D < 30 || D > 430) return;
+    const dot = (dx*c + dz*s)/D;
+    if(dot < 0.88) return;
+    const sc = D*(2 - dot);
+    if(sc < bestScore){ bestScore = sc; best = {dx, dz, D, dy: ty - y0}; }
+  };
+  for(const b of balloons) if(b.gone <= 0) look(b.x, b.y, b.z);
+  if(NET.st === "on") for(const o of NET.others.values()) look(o.mesh.position.x, 9, o.mesh.position.z);
+  let vx, vy, vz;
+  if(best){
+    const T = best.D/H;
+    vx = best.dx/best.D*H; vz = best.dz/best.D*H; vy = (best.dy + 0.5*SHOT_G*T*T)/T;
+  } else { vx = c*H; vz = s*H; vy = 75; }
+  spawnShot(x0, y0, z0, vx, vy, vz, S.color, true);
+  sfx("shoot");
+  if(NET.st === "on"){
+    const r = v => Math.round(v*10)/10;
+    netSend({t:"f", id:NET.me, x:r(x0), y:r(y0), z:r(z0), vx:r(vx), vy:r(vy), vz:r(vz), c:S.color});
+  }
+}
+function netShot(m){
+  if(m.id === NET.me) return;
+  const v = [m.x, m.y, m.z, m.vx, m.vy, m.vz];
+  if(!v.every(isFinite) || v.some(a => Math.abs(a) > 5000)) return;
+  if(shots.length > 40) return;
+  spawnShot(m.x, m.y, m.z, m.vx, m.vy, m.vz, idx(m.c, PAINTS.length), false);
+}
+function popBalloon(b){
+  splash(b.x, b.y, b.z, b.col, 16);
+  coins(b.x, b.y, b.z); sfx("pop"); sfx("coin");
+  b.gone = 3;
+  S.money += 5; S.shiftMoney += 5;
+  toast("Шар лопнул! +5 ж", "", "good");
+  taskProgress("pop", 1);
+  paintHUD();
+}
+function updateShots(dt){
+  fireCd = Math.max(0, fireCd - dt);
+  if(keys.fire || fireTap) fire();
+  fireTap = false;
+  for(let i=shots.length-1;i>=0;i--){
+    const b = shots[i];
+    b.l -= dt; b.vy -= SHOT_G*dt;
+    b.x += b.vx*dt; b.y += b.vy*dt; b.z += b.vz*dt;
+    b.mesh.position.set(b.x, b.y, b.z);
+    let hit = false;
+    if(b.mine){
+      for(const q of balloons){
+        if(q.gone > 0) continue;
+        const dx = q.x - b.x, dy = q.y - b.y, dz = q.z - b.z;
+        if(dx*dx + dy*dy*0.7 + dz*dz < 110){ popBalloon(q); hit = true; break; }
+      }
+      if(!hit && NET.st === "on" && b.y < 17) for(const o of NET.others.values()){
+        const dx = o.mesh.position.x - b.x, dz = o.mesh.position.z - b.z;
+        if(dx*dx + dz*dz < 170){
+          hit = true; netSend({t:"hit", id:NET.me, to:o.id, c:b.c});
+          toast("Попал! " + oname(o) + " в краске", "Брызги краски — никому не больно", "good");
+          break;
+        }
+      }
+    } else {
+      const dx = car.x - b.x, dz = car.y - b.z;
+      if(b.y < 17 && dx*dx + dz*dz < 170) hit = true;
+    }
+    if(!hit && b.y < 14) for(const t of traffic){
+      const dx = t.x - b.x, dz = t.y - b.z;
+      if(dx*dx + dz*dz < 110){ hit = true; break; }
+    }
+    if(!hit && (b.y <= 1 || b.l <= 0)) hit = true;
+    if(hit){
+      splash(b.x, Math.max(1, b.y), b.z, PAINTS[b.c].c, 12);
+      if(b.mine) sfx("splat");
+      scene.remove(b.mesh); shots.splice(i, 1);
+    }
+  }
+}
+
+/* меня обрызгали: кляксы на такси, сами смываются */
+const paintBlobs = [];
+const BLOB_SPOTS = [[8,12.2,-4],[8,12.2,4],[-9,11.7,-5],[-9,11.7,5],[2,11.7,-6.2],[-5,11.7,6.2],[10,14.1,0],[-12,11.7,0]];
+function paintHit(m){
+  if(m.to !== NET.me) return;
+  const o = NET.others.get(m.id), c = idx(m.c, PAINTS.length);
+  const mat = shotMats[c];
+  for(let k=0;k<3;k++){
+    if(paintBlobs.length >= 6){ const old = paintBlobs.shift(); taxi.remove(old.mesh); }
+    const sp = BLOB_SPOTS[Math.floor(Math.random()*BLOB_SPOTS.length)];
+    const mesh = new THREE.Mesh(SPH, mat);
+    const r = 1.8 + Math.random()*1.4;
+    mesh.scale.set(r, 0.28, r*0.8); mesh.position.set(sp[0] + (Math.random()-0.5)*3, sp[1] - 0.15, sp[2]);
+    taxi.add(mesh); paintBlobs.push({mesh, l:7});
+  }
+  splash(car.x, 14, car.y, PAINTS[c].c, 10);
+  sfx("splat");
+  toast((o ? oname(o) : "Друг") + " обрызгал тебя!", "Краска смоется сама", "");
+}
+function updateBlobs(dt){
+  for(let i=paintBlobs.length-1;i>=0;i--){
+    const b = paintBlobs[i]; b.l -= dt;
+    if(b.l < 1) b.mesh.scale.multiplyScalar(Math.max(0.2, 1 - dt*3));
+    if(b.l <= 0){ taxi.remove(b.mesh); paintBlobs.splice(i, 1); }
+  }
 }
 
 /* --- следы шин --- */
@@ -1750,7 +1970,7 @@ function syncScene(dt){
   }
   syncLights();
   updateSky();
-  updateCoins(dt);
+  updateCoins(dt); updateBalloons(dt); updateSplash(dt); updateBlobs(dt);
   updateSkids(dt);
   updateFigs(dt);
   updateStationFx(dt);
@@ -1881,7 +2101,7 @@ function drawMini(){
     mx.fillStyle = Math.floor(clock*6)%2 ? "#2F6FD0" : "#D24437";
     mx.beginPath(); mx.arc(c.x*sx, c.y*sy, 4, 0, 6.283); mx.fill();
   }
-  netMini(sx, sy);
+  balMini(sx, sy); netMini(sx, sy);
   mx.fillStyle = PAINTS[S.color].c; mx.strokeStyle = "#2B343A"; mx.lineWidth = 1.5;
   mx.beginPath(); mx.arc(car.x*sx, car.y*sy, 4, 0, 6.283); mx.fill(); mx.stroke();
 }
@@ -1892,11 +2112,12 @@ const KMAP = {ArrowUp:"gas", KeyW:"gas", ArrowDown:"brake", KeyS:"brake", ArrowL
 addEventListener("keydown", e=>{
   if(e.target.closest && e.target.closest("input")) return;
   if(KMAP[e.code]){ keys[KMAP[e.code]] = true; e.preventDefault(); }
+  if((e.code === "Space" || e.code === "KeyF") && veil.hidden){ if(!e.repeat) fireTap = true; keys.fire = true; e.preventDefault(); }
   if(e.code === "KeyC") nextView();
   if(e.code === "KeyM") toggleSound();
   if(e.code === "Escape"){ if(veil.hidden && S.started) pauseMenu(); else if(!veil.hidden && S.started) closeSheet(); }
 });
-addEventListener("keyup", e=>{ if(KMAP[e.code]) keys[KMAP[e.code]] = false; });
+addEventListener("keyup", e=>{ if(KMAP[e.code]) keys[KMAP[e.code]] = false; if(e.code === "Space" || e.code === "KeyF") keys.fire = false; });
 function clearKeys(){
   for(const k in keys) keys[k] = false;
   document.querySelectorAll("#touch .pad").forEach(p=> p.classList.remove("act"));
@@ -1906,7 +2127,7 @@ document.addEventListener("visibilitychange", ()=>{ if(document.hidden) clearKey
 addEventListener("pointerdown", ()=>{ audioBoot(); try{ window.focus(); }catch(e){} }, true);
 document.querySelectorAll("#touch .pad").forEach(p=>{
   let pid = null;
-  const set = on =>{ keys[p.dataset.k] = on; p.classList.toggle("act", on); };
+  const set = on =>{ keys[p.dataset.k] = on; p.classList.toggle("act", on); if(on && p.dataset.k === "fire") fireTap = true; };
   p.addEventListener("pointerdown", e=>{
     e.preventDefault(); pid = e.pointerId;
     try{ p.setPointerCapture(e.pointerId); }catch(err){}
@@ -1922,6 +2143,7 @@ document.querySelectorAll("#touch .pad").forEach(p=>{
 /* ---------- обновление ---------- */
 function update(dt){
   clock += dt;
+  updateShots(dt);
   const P = stats();
   if(keys.gas) car.sp += P.acc*dt;
   else if(keys.brake) car.sp -= (car.sp > 3 ? P.acc*1.9 : P.acc*1.1)*dt;
@@ -2131,6 +2353,7 @@ const TASKS = {
   perfect: {n:[2,3], text:n=>`${n} поездки на три звезды`, reward:90},
   kinds:   {n:[3,4], text:n=>`Прокати ${n} разных зверей`, reward:70},
   paint:   {n:[1,1], text:()=>"Перекрась такси", reward:50},
+  pop:     {n:[5,8], text:n=>`Лопни ${n} воздушных шаров`, reward:60},
   green:   {n:[3,4], text:n=>`${n} поездки без красного света`, reward:70}
 };
 function today(){
@@ -2419,8 +2642,8 @@ function startSheet(){
     <h2>Хвостоград Такси 3D</h2>
     <div class="sub" style="margin-bottom:0">За рулём ${a.name}. Забирай пассажира у зелёного столба, вези к красному.</div></div></div>
     ${modeCards()}
-    <div class="keys">Руль: <kbd>←</kbd> <kbd>→</kbd> или <kbd>A</kbd> <kbd>D</kbd> · газ <kbd>↑</kbd> <kbd>W</kbd> · тормоз <kbd>↓</kbd> <kbd>S</kbd> · камера <kbd>C</kbd><br>
-    На телефоне — кнопки внизу экрана.<br>
+    <div class="keys">Руль: <kbd>←</kbd> <kbd>→</kbd> или <kbd>A</kbd> <kbd>D</kbd> · газ <kbd>↑</kbd> <kbd>W</kbd> · тормоз <kbd>↓</kbd> <kbd>S</kbd> · камера <kbd>C</kbd> · шарик с краской <kbd>Пробел</kbd> или <kbd>F</kbd><br>
+    На телефоне — кнопки внизу экрана, шарик — синяя кнопка 💦. Лопай воздушные шары — за каждый 5 ж.<br>
     Бензин кончается — заезжай на заправку <b>З</b>. Такси пачкается — мойка <b>М</b>. Новый цвет — покраска <b>П</b>.</div>
     <div class="foot"><span class="label">${S.orders ? `в кассе ${fmt(S.money)} ж · ★ ${S.stars}` : "первая смена"}</span>
     <span style="display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end"><button class="btn" data-net>${NET.st === "on" ? "Комната " + roomName() : "Играть с друзьями"}</button>
@@ -2574,10 +2797,12 @@ function netData(m, c){
   if(!NET.host) NET.hostSeen = nowS();
   if(NET.host){
     if(m.id !== c.peer) return;                                      // гость говорит только за себя
-    if(m.t === "s" || m.t === "r") for(const o of NET.conns) if(o !== c && o.open) o.send(m);
+    if(m.t === "s" || m.t === "r" || m.t === "f" || m.t === "hit") for(const o of NET.conns) if(o !== c && o.open) o.send(m);
   }
   if(m.t === "s") netState(m);
   else if(m.t === "r") netReact(m.id, m.k);
+  else if(m.t === "f") netShot(m);
+  else if(m.t === "hit") paintHit(m);
   else if(m.t === "bye") netGone(m.id);
   else if(m.t === "ride" && NET.host) netTeam(NET.team + 1);
   else if(m.t === "team" && !NET.host){ NET.team = m.n|0; netPaintBar(); }
